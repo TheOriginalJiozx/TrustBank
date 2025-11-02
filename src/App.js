@@ -45,8 +45,7 @@ function App() {
           Hvad er TrustBank?
         </h2>
         <p className="text-[#555] max-w-3xl mx-auto text-lg md:text-xl mb-10">
-          TrustBank anvender avanceret teknologi og personlig rådgivning til at give dig fuld kontrol over din økonomi – sikkert, effektivt og overskueligt. 
-          Vi gør bankforretninger enkle og transparente, så du altid ved, hvor du står.
+          TrustBank anvender intelligente algoritmer til automatisk at kategorisere og strukturere dine transaktioner, hvilket giver dig et klart, trygt og professionelt overblik over din økonomi.
         </p>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto text-left">
