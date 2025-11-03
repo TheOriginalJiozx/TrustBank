@@ -5,6 +5,7 @@ import Index from "./pages/home";
 import Register from "./pages/register";
 import Footer from "./components/footer";
 import Login from "./pages/login";
+import Me from "./pages/me";
 
 function App() {
     useEffect(() => {
@@ -22,7 +23,8 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/register" element={<Register />} />
-                    <Route path="/login" element={<Login />} /> 
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/me" element={<Me />} />
                 </Routes>
             </main>
 
