@@ -18,13 +18,16 @@ cd trustbank
 
 npm install
 
-Start (Development)
+Start Frontend
 npm start
 # Kører på http://localhost:3000
 
 Build (produktion)
 npm run build
 
+Start Backend
+npm run dev
+# Kører på http://localhost:3001
 
 Hvis port 3000 (Frontend) allerede er i brug: PORT=3002 npm start
 Hvis port 3001 (Backend) allerede er i brug: PORT=3003 npm run dev
