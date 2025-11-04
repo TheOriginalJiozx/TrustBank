@@ -2,10 +2,10 @@ import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import Header from "./components/header";
 import Index from "./pages/home";
-import Register from "./pages/register";
 import Footer from "./components/footer";
 import Login from "./pages/login";
 import Me from "./pages/me";
+import Post from "./pages/transaction/post"
 
 function App() {
     useEffect(() => {
@@ -22,9 +22,9 @@ function App() {
             <main className="flex-grow">
                 <Routes>
                     <Route path="/" element={<Index />} />
-                    <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/me" element={<Me />} />
+                    <Route path="/post" element={<Post />} />
                 </Routes>
             </main>
 
