@@ -162,7 +162,7 @@ Don't forget to give the project a star! Thanks again!
 ### Top contributors:
 
 <a href="https://github.com/TheOriginalJiozx/TrustBank/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=TheOriginalJiozx/TrustBank" alt="contrib.rocks image" />
+  <img src="https://contrib.rocks/image?repo=TheOriginalJiozx/TrustBank&nocache=1" alt="contrib.rocks image" />
 </a>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
