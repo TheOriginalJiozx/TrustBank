@@ -1,4 +1,4 @@
-import { getCloseMatches } from "string-similarity";
+import stringSimilarity from "string-similarity";
 
 let categories = {
   "Mad & Drikke": {
@@ -310,7 +310,7 @@ let categories = {
       { name: "Dagpenge", regNo: "4567", accNo: "71920358" },
       { name: "Sygedagpenge", regNo: "4578", accNo: "50817294" }
     ]
-  }
+  },
 };
 
 function normalize(text) {
@@ -332,25 +332,27 @@ function directMatch(description) {
     return matches[0].category;
 }
 
-function fuzzyMatch(description) {
-    const words = description.split(/\s+/);
+export function fuzzyMatch(description) {
+    const desc = description.toLowerCase().replace(/[.,']/g, '');
+    const words = desc.split(/\s+/);
+
+    let bestCategory = null;
+    let bestScore = 0;
+
+    for (const [category, { companies }] of Object.entries(categories)) {
+        const companyNames = companies.map(c => c.name.toLowerCase());
         for (let word of words) {
-            for (const [category, { companies }] of Object.entries(categories)) {
-                const close = getCloseMatches(word, companies, { cutoff: 0.8 });
-                if (close.length > 0) return category;
+            const match = stringSimilarity.findBestMatch(word, companyNames);
+            if (match.bestMatch.rating > bestScore) {
+                bestScore = match.bestMatch.rating;
+                bestCategory = category;
             }
         }
-    return null;
-}
+    }
 
-export function findCompanyByAccount(regNo, accNo) {
-  for (let category in categories) {
-    const match = categories[category].companies.find(
-      (c) => c.regNo === regNo && c.accNo === accNo
-    );
-    if (match) return { name: match.name, category };
-  }
-  return null;
+    if (bestScore >= 0.45) return bestCategory;
+
+    return null;
 }
 
 export function categorizeTransaction(description) {
@@ -363,4 +365,27 @@ export function categorizeTransaction(description) {
     if (category) return category;
 
     return "Ukendt kategori";
+}
+
+export function findCompanyByAccount(regNo, accNo, description = "") {
+    for (const [category, { companies }] of Object.entries(categories)) {
+        const company = companies.find(c => c.regNo === regNo && c.accNo === accNo);
+        if (company) {
+            return {
+                name: company.name,
+                category,
+                regNo,
+                accNo
+            };
+        }
+    }
+
+    const category = categorizeTransaction(description);
+
+    return {
+        name: description || "Ukendt firma",
+        category,
+        regNo,
+        accNo
+    };
 }

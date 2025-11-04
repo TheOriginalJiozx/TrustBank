@@ -1,9 +1,22 @@
 import NextCors from "nextjs-cors";
 
-async function getCompanyName(regNo, accNo) {
-  const res = await fetch(`http://localhost:3001/api/findCompany?regNo=${regNo}&accNo=${accNo}`);
-  const data = await res.json();
-  return data.name;
+async function getCompanyName(regNo, accNo, description = "") {
+  try {
+    const res = await fetch(
+      `http://localhost:3001/api/findCompany?regNo=${regNo}&accNo=${accNo}&description=${encodeURIComponent(description)}`
+    );
+    if (!res.ok) throw new Error("Netværksfejl");
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Virksomheden findes ikke", err);
+    return {
+      name: description || "Ukendt firma",
+      category: "Ukendt kategori",
+      regNo,
+      accNo
+    };
+  }
 }
 
 export default async function handler(req, res) {
@@ -13,14 +26,15 @@ export default async function handler(req, res) {
   });
 
   if (req.method === "POST") {
-    const { regNo, accNo, amount, category } = req.body;
+    const { regNo, accNo, description } = req.body;
 
     try {
-      const company = await getCompanyName(regNo, accNo);
+      const company = await getCompanyName(regNo, accNo, description);
 
+      // Kun returner company-objektet
       res.status(200).json({
         status: "success",
-        data: { company, accNo, regNo, amount, category },
+        data: { company },
       });
     } catch (err) {
       console.error(err);

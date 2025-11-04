@@ -30,7 +30,7 @@ function Header() {
 
         {user ? (
           <button onClick={handleLogout} className="text-red-600 font-semibold hover:text-red-800 transition">
-            Log ud {'loggedInUser'}
+            Log ud
           </button>
         ) : (
           <a href="/login" className="text-green-600 font-semibold hover:text-green-800 transition">

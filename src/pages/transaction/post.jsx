@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Post() {
   const [responseData, setResponseData] = useState(null);
@@ -9,6 +10,16 @@ function Post() {
     amount: "",
     category: "",
   });
+
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('loggedInUser');
+    if (!storedUser) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -109,42 +120,11 @@ function Post() {
               />
             </div>
 
-            <div className="flex flex-col text-left">
-              <label htmlFor="category" className="mb-1 font-medium">
-                Kategori
-              </label>
-              <select
-                id="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="border border-gray-300 rounded px-3 py-2 bg-white"
-              >
-                <option value="">Vælg kategori</option>
-                <option value="mad_drikke">Mad & Drikke</option>
-                <option value="transport">Transport</option>
-                <option value="streaming_abonnement">Streaming & Abonnement</option>
-                <option value="bolig">Bolig</option>
-                <option value="forsikringer">Forsikringer</option>
-                <option value="sundhed_medicin">Sundhed & Medicin</option>
-                <option value="boern_familie">Børn & Familie</option>
-                <option value="shopping_toej">Shopping & Tøj</option>
-                <option value="restaurant_cafe">Restaurant & Café</option>
-                <option value="fritid_underholdning">Fritid & Underholdning</option>
-                <option value="rejser_ferie">Rejser & Ferie</option>
-                <option value="gaver_donationer">Gaver & Donationer</option>
-                <option value="uforudsete_udgifter">Uforudsete Udgifter</option>
-                <option value="opsparing_investeringer">Opsparing & Investeringer</option>
-                <option value="bonus_investering">Bonus & Investering</option>
-                <option value="bonus_provision">Bonus & Provision</option>
-                <option value="skat_afgifter">SKAT & Afgifter</option>
-                <option value="person_pleje">Personlig pleje</option>
-                <option value="uddannelse_kurser">Uddannelse & Kurser</option>
-              </select>
-            </div>
-
             <button type="submit" className="bg-[#003366] text-white py-2 px-4 rounded hover:bg-[#002244] transition">
               Overfør
             </button>
+
+            <br />
           </fieldset>
         </form>
 
