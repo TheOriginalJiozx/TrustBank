@@ -6,7 +6,6 @@ import Register from "./pages/register";
 import Footer from "./components/footer";
 import Login from "./pages/login";
 import Me from "./pages/me";
-import ReadmePage from './pages/readme';
 
 function App() {
     useEffect(() => {
@@ -26,7 +25,6 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/me" element={<Me />} />
-                    <Route path="/readme" element={<ReadmePage />} />
                 </Routes>
             </main>
 
