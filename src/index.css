@@ -15,3 +15,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.Dropdown-option {
+  @apply px-3 py-2 rounded-xl text-left transition-colors;
+}
+
+.Dropdown-option:hover {
+  @apply bg-gray-100;
+}
+
+.Dropdown-option.is-selected {
+  @apply bg-gray-200;
+}

@@ -110,9 +110,11 @@ function Home() {
         <p className="max-w-2xl mx-auto text-lg mb-8">
           Over 50.000 kunder har valgt TrustBank for vores gennemsigtighed, sikkerhed og personlige rådgivning.
         </p>
+        {!user && (
         <button className="px-8 py-3 bg-white text-[#003366] rounded-xl font-semibold hover:bg-[#e6e6e6] transition-all">
           Udforsk i dag
         </button>
+        )}
       </section>
 
     </div>

@@ -12,7 +12,7 @@ export default function Me() {
       localStorage.setItem('loggedInUser', JSON.stringify({ username: user }));
       navigate('/', { replace: true });
     } else {
-      navigate('/profile');
+      navigate('/account');
     }
   }, [navigate]);
 

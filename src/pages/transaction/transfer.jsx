@@ -84,7 +84,7 @@ function Post() {
       <main className="flex flex-col flex-1 items-center text-center px-6 pt-28 bg-gradient-to-br from-[#eaf4ff] via-[#f8f9fb] to-[#ffffff] relative overflow-hidden">
         <div className="max-w-4xl z-10">
           <h1 className="text-5xl md:text-6xl font-extrabold mb-4 tracking-tight text-[#003366]">
-            Velkommen til TrustBank Overførselssystem
+            TrustBank Overførselssystem
           </h1>
           <p className="text-lg md:text-xl text-[#4a4a4a] mb-8">
             Din sikre vej til at overføre penge.
