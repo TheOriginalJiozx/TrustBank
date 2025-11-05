@@ -58,7 +58,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Product Name Screen Shot][product-screenshot]](https://localhost:3000)
 
 ---- SKRIV HER ----
 
@@ -91,8 +91,6 @@ This is an example of how to list things you need to use the software and how to
 
 ### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
-
 1. Clone the repo
    ```sh
    git clone https://github.com/TheOriginalJiozx/TrustBank.git
@@ -109,12 +107,21 @@ _Below is an example of how you can instruct your audience on installing and set
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+### Run project
+
+1. Start frontend in a terminal
+   ```sh
+   npm start
+   ```
+2. Start backend in another terminal
+   ```sh
+   npm run dev
+   ```
+
 <!-- USAGE EXAMPLES -->
 ## Usage
 
 Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -160,7 +167,9 @@ Distributed under the project_license. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
+Omar Al-Ali - [TheOriginalJiozx](https://github.com/TheOriginalJiozx)<p />
+Yasin Dhalin - [Dhalinn](https://github.com/Dhalinn) <p />
+Maksym Yuzefovych - [Maksyuze](https://github.com/maksyuze456)
 
 Project Link: [https://github.com/TheOriginalJiozx/TrustBank](https://github.com/TheOriginalJiozx/TrustBank)
 
@@ -186,7 +195,7 @@ Use this space to list resources you find helpful and would like to give credit 
 [stars-url]: https://github.com/TheOriginalJiozx/TrustBank/stargazers
 [issues-shield]: https://img.shields.io/github/issues/TheOriginalJiozx/TrustBank.svg?style=for-the-badge
 [issues-url]: https://github.com/TheOriginalJiozx/TrustBank/issues
-[product-screenshot]: images/screenshot.png
+[product-screenshot]: readme_images/screenshot.png
 [license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
 [license-url]: https://github.com/TheOriginalJiozx/TrustBank/blob/master/LICENSE.txt
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
