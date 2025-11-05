@@ -24,9 +24,9 @@ function Header() {
       <img src={logo} alt="TrustBank Logo" className="h-28" />
 
       <nav className="flex gap-6">
-        <a href="#home" className="text-black-800 font-medium hover:text-black-600 transition">Hjem</a>
+        <a href="/" className="text-black-800 font-medium hover:text-black-600 transition">Hjem</a>
         <a href="#services" className="text-black-800 font-medium hover:text-black-600 transition">Services</a>
-        <a href="#contact" className="text-black-800 font-medium hover:text-black-600 transition">Kontakt</a>
+        <a href="/contact" className="text-black-800 font-medium hover:text-black-600 transition">Kontakt</a>
 
         {user ? (
           <button onClick={handleLogout} className="text-red-600 font-semibold hover:text-red-800 transition">

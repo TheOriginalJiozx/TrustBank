@@ -1,4 +1,5 @@
 import { CheckCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 function ServiceCard({ title, text }) {
   return (
@@ -10,6 +11,15 @@ function ServiceCard({ title, text }) {
 }
 
 function Home() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+      const storedUser = localStorage.getItem('loggedInUser');
+      if (storedUser) {
+        setUser(storedUser);
+      }
+    }, []);
+  
   return (
     <div className="min-h-screen flex flex-col bg-[#f8f9fb] text-slate-800 font-sans">
 
@@ -23,12 +33,13 @@ function Home() {
           </p>
 
           <div className="flex gap-6 flex-wrap justify-center mb-12">
-            <button className="px-8 py-3 rounded-xl bg-[#003366] text-white font-semibold shadow-md hover:bg-[#00264d] transition-all duration-300">
-              Log ind
-            </button>
-            <button className="px-8 py-3 rounded-xl border border-[#003366] text-[#003366] font-semibold shadow-md hover:bg-[#003366]/10 transition-all duration-300">
-              Opret konto
-            </button>
+            {!user && (
+              <a href="/login">
+                <button class="px-8 py-3 rounded-xl bg-[#003366] text-white font-semibold shadow-md hover:bg-[#00264d] transition-all duration-300">
+                  Log ind
+                </button>
+              </a>
+            )}
           </div>
         </div>
 
@@ -100,7 +111,7 @@ function Home() {
           Over 50.000 kunder har valgt TrustBank for vores gennemsigtighed, sikkerhed og personlige rådgivning.
         </p>
         <button className="px-8 py-3 bg-white text-[#003366] rounded-xl font-semibold hover:bg-[#e6e6e6] transition-all">
-          Opret konto nu
+          Udforsk i dag
         </button>
       </section>
 
