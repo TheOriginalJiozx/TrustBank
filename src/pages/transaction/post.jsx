@@ -58,6 +58,22 @@ function Post() {
 
       const data = await res.json();
       setResponseData(data);
+
+      const storedUser = localStorage.getItem("loggedInUser");
+
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        const userKey = `transactions_${user.username}`;
+
+        const existingTransactions = JSON.parse(localStorage.getItem(userKey)) || [];
+
+        existingTransactions.push({
+          ...updatedFormData,
+          timestamp: new Date().toISOString()
+        });
+
+        localStorage.setItem(userKey, JSON.stringify(existingTransactions));
+      }
     } catch (error) {
       setResponseData({ error: "Noget gik galt med overførslen." });
     }

@@ -31,7 +31,6 @@ export default async function handler(req, res) {
     try {
       const company = await getCompanyName(regNo, accNo, description);
 
-      // Kun returner company-objektet
       res.status(200).json({
         status: "success",
         data: { company },

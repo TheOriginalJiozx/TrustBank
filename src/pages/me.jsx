@@ -9,7 +9,7 @@ export default function Me() {
     const user = params.get('user');
 
     if (user) {
-      localStorage.setItem('loggedInUser', user);
+      localStorage.setItem('loggedInUser', JSON.stringify({ username: user }));
       navigate('/', { replace: true });
     } else {
       navigate('/profile');

@@ -3,10 +3,9 @@ import NextCors from "nextjs-cors";
 import { findCompanyByAccount } from "../../service/categorizeService";
 
 export default async function handler(req, res) {
-  // 1. Tillad CORS først
   await NextCors(req, res, {
     methods: ["GET", "POST", "OPTIONS"],
-    origin: "http://localhost:3000", // din frontend
+    origin: "http://localhost:3000",
     optionsSuccessStatus: 200,
   });
 
@@ -17,7 +16,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 2. Sørg for regNo og accNo er strings (ellers kan findCompanyByAccount fejle)
     const company = findCompanyByAccount(String(regNo), String(accNo), description || "");
 
     return res.status(200).json(company);
