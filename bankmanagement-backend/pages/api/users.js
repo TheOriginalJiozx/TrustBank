@@ -1,31 +1,38 @@
-// C:\...\bankmanagement-backend\pages\api\users.js
 import fs from 'fs';
 import path from 'path';
 import NextCors from 'nextjs-cors';
 
-const filePath = path.join(process.cwd(), 'users.json');
+const filePath = path.join(process.cwd(), 'data', 'users.json');
 
 export default async function handler(req, res) {
   try {
-    // CORS
     await NextCors(req, res, {
-      origin: 'http://localhost:3000', // frontend
+      origin: 'http://localhost:3000',
       methods: ['GET', 'POST', 'OPTIONS'],
       optionsSuccessStatus: 200,
     });
 
-    // Sørg for, at filen findes
     if (!fs.existsSync(filePath)) {
       fs.writeFileSync(filePath, JSON.stringify({}, null, 2));
     }
 
-    // Læs eksisterende data
     let users = {};
     try {
       const data = fs.readFileSync(filePath, 'utf8');
       users = data.trim() ? JSON.parse(data) : {};
     } catch (err) {
       users = {};
+    }
+
+    if (req.method === 'GET') {
+      const { username } = req.query;
+      if (!username) return res.status(400).json({ message: 'username mangler' });
+
+      if (!users[username]) {
+        return res.status(404).json({ message: 'Bruger findes ikke' });
+      }
+
+      return res.status(200).json(users[username]);
     }
 
     if (req.method === 'POST') {
@@ -35,13 +42,11 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: 'username mangler' });
       }
 
-      // Opret bruger hvis den ikke findes
       if (!users[username]) {
         const regNo = String(Math.floor(1000 + Math.random() * 9000));
         const accNo = String(Math.floor(10000000 + Math.random() * 90000000));
         users[username] = { username, regNo, accNo };
 
-        // Gem til fil
         fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
       }
 

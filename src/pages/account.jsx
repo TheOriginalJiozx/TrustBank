@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Account() {
   const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('loggedInUser');
-      if (!raw) return;
-      setUserData(JSON.parse(raw));
-    } catch {
-      // optionally clear bad data or redirect
+    const raw = localStorage.getItem('loggedInUser');
+    if (!raw) {
+      navigate('/login', { replace: true }); // Redirect hvis ikke logget ind
+      return;
     }
-  }, []);
+    setUserData(JSON.parse(raw));
+  }, [navigate]);
 
   if (!userData) return <p>Indlæser brugerdata...</p>;
 
