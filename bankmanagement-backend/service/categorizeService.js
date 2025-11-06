@@ -376,7 +376,7 @@ export function findCompanyByAccount(regNo, accNo, description = "") {
                 category,
                 regNo,
                 accNo,
-                comment: description // <-- her bruger vi description som comment
+                comment: description
             };
         }
     }
@@ -384,10 +384,10 @@ export function findCompanyByAccount(regNo, accNo, description = "") {
     const category = categorizeTransaction(description);
 
     return {
-        name: description || "Ukendt firma",
+        name: "Ukendt virksomhed",
         category,
         regNo,
         accNo,
-        comment: description // <-- her også
+        comment: description
     };
 }

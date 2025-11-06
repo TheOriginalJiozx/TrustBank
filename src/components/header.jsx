@@ -8,12 +8,10 @@ function Header() {
   const [selected, setSelected] = useState(null);
   const navigate = useNavigate();
 
-  // Tjek localStorage ved mount
   useEffect(() => {
     const storedUser = localStorage.getItem('loggedInUser');
     if (storedUser) setUser(JSON.parse(storedUser));
 
-    // Lyt efter changes i localStorage
     const handleStorageChange = () => {
       const updatedUser = localStorage.getItem('loggedInUser');
       setUser(updatedUser ? JSON.parse(updatedUser) : null);
@@ -28,7 +26,7 @@ function Header() {
     localStorage.removeItem('loggedInUser');
     setUser(null);
     navigate('/login');
-    window.dispatchEvent(new Event('storage')); // trigger re-render
+    window.dispatchEvent(new Event('storage'));
   };
 
   const options = [

@@ -2,19 +2,16 @@ import NextCors from "nextjs-cors";
 import { findCompanyByAccount } from '../../service/categorizeService';
 
 export default async function handler(req, res) {
-  // Tillad CORS
   await NextCors(req, res, {
     methods: ["GET", "POST", "OPTIONS"],
     origin: "http://localhost:3000",
     optionsSuccessStatus: 200,
   });
 
-  // Accepter kun GET eller POST
   if (!["POST", "GET"].includes(req.method)) {
     return res.status(405).json({ error: "Metode ikke tilladt" });
   }
 
-  // Hent data fra body (POST) eller query (GET)
   const { regNo, accNo, comment } = req.method === "POST" ? req.body : req.query;
 
   if (!regNo || !accNo) {
