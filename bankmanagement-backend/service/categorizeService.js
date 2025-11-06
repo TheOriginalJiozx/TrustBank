@@ -321,7 +321,7 @@ function directMatch(description) {
     let matches = [];
     for (const [category, { companies, priority }] of Object.entries(categories)) {
         for (const company of companies) {
-            if (description.includes(company)) {
+            if (description.includes(company.name.toLowerCase())) {
                 matches.push({ category, priority });
                 break;
             }
@@ -375,7 +375,8 @@ export function findCompanyByAccount(regNo, accNo, description = "") {
                 name: company.name,
                 category,
                 regNo,
-                accNo
+                accNo,
+                comment: description // <-- her bruger vi description som comment
             };
         }
     }
@@ -386,6 +387,7 @@ export function findCompanyByAccount(regNo, accNo, description = "") {
         name: description || "Ukendt firma",
         category,
         regNo,
-        accNo
+        accNo,
+        comment: description // <-- her også
     };
 }

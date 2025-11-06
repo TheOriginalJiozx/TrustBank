@@ -34,17 +34,19 @@ export default function Transactions() {
               className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white"
             >
               <p>
+                <strong>Reg og kontonummer:</strong> {t.regNo} / {t.accNo}
+              </p>
+              <p>
                 <strong>Beløb:</strong> {t.amount} kr.
               </p>
               <p>
-                <strong>Modtager:</strong> {t.company}
+                <strong>Modtager:</strong> {t.company || t.customer || "Ukendt"}
               </p>
               <p>
-                <strong>Kategori:</strong> {t.category}
+                <strong>Kategori:</strong> {t.category || "Ukendt kategori"}
               </p>
               <p>
-                <strong>Dato:</strong> {" "}
-                {t.timestamp
+                <strong>Dato:</strong> {t.timestamp
                   ? new Date(t.timestamp).toLocaleString("da-DK")
                   : "Ukendt"}
               </p>

@@ -5,6 +5,7 @@ import Index from "./pages/home";
 import Footer from "./components/footer";
 import Login from "./pages/login";
 import Me from "./pages/me";
+import Account from "./pages/account";
 import Transfer from "./pages/transaction/transfer"
 import Transactions from './pages/transactions';
 
@@ -27,6 +28,7 @@ function App() {
                     <Route path="/me" element={<Me />} />
                     <Route path="/transfer" element={<Transfer />} />
                     <Route path="/transactions" element={<Transactions />} />
+                    <Route path="/account" element={<Account />} />                    
                 </Routes>
             </main>
 

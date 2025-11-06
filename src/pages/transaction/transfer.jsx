@@ -9,6 +9,7 @@ function Post() {
     regNo: "",
     amount: "",
     category: "",
+    comment: "",
   });
 
   const [user, setUser] = useState(null);
@@ -33,21 +34,22 @@ function Post() {
 
     try {
       const res = await fetch(
-          `http://localhost:3001/api/findCompany?regNo=${formData.regNo}&accNo=${formData.accNo}`
+        `http://localhost:3001/api/findCompany?regNo=${formData.regNo}&accNo=${formData.accNo}&comment=${encodeURIComponent(formData.comment)}`
       );
 
-    if (res.ok) {
-          const company = await res.json();
-          if (company) {
-            updatedFormData.company = company.name;
-            updatedFormData.category = company.category;
-          } else {
-            updatedFormData.company = "Ukendt";
-          }
+      if (res.ok) {
+        const company = await res.json();
+        if (company) {
+          updatedFormData.company = company.name;
+          updatedFormData.category = company.category;
+        } else {
+          updatedFormData.company = "Ukendt";
         }
-      } catch(err) {
-          console.log("Virksomheden findes ikke", err);
       }
+    } catch (err) {
+      console.log("Virksomheden findes ikke", err);
+      updatedFormData.company = "Ukendt";
+    }
 
     try {
       const res = await fetch("http://localhost:3001/api/transactions/posttransactions", {
@@ -60,7 +62,6 @@ function Post() {
       setResponseData(data);
 
       const storedUser = localStorage.getItem("loggedInUser");
-
       if (storedUser) {
         const user = JSON.parse(storedUser);
         const userKey = `transactions_${user.username}`;
@@ -95,28 +96,28 @@ function Post() {
           <fieldset className="flex flex-col gap-4">
             <div className="flex flex-col text-left">
               <label htmlFor="accNo" className="mb-1 font-medium">
-                Virksomhedens kontonummer
+                Modtagers kontonummer
               </label>
               <input
                 type="number"
                 id="accNo"
                 value={formData.accNo}
                 onChange={handleChange}
-                placeholder="Virksomhedens kontonummer"
+                placeholder="Kontonummer"
                 className="border border-gray-300 rounded px-3 py-2"
               />
             </div>
 
             <div className="flex flex-col text-left">
               <label htmlFor="regNo" className="mb-1 font-medium">
-                Virksomhedens registeringsnummer
+                Modtagers registeringsnummer
               </label>
               <input
                 type="number"
                 id="regNo"
                 value={formData.regNo}
                 onChange={handleChange}
-                placeholder="Virksomhedens registreringsnummer"
+                placeholder="Registreringsnummer"
                 className="border border-gray-300 rounded px-3 py-2"
               />
             </div>
@@ -136,11 +137,24 @@ function Post() {
               />
             </div>
 
+            <div className="flex flex-col text-left">
+              <label htmlFor="comment" className="mb-1 font-medium">
+                Kommentar
+              </label>
+              <input
+                type="text"
+                id="comment"
+                value={formData.comment || ""}
+                onChange={handleChange}
+                placeholder="Kommentar / Beskrivelse"
+                className="border border-gray-300 rounded px-3 py-2"
+              />
+            </div>
+
             <button type="submit" className="bg-[#003366] text-white py-2 px-4 rounded hover:bg-[#002244] transition">
               Overfør
             </button>
 
-            <br />
           </fieldset>
         </form>
 
@@ -153,6 +167,7 @@ function Post() {
           </div>
         )}
 
+        <br />
         <div className="absolute top-[-80px] left-[-40px] w-72 h-72 bg-[#d0e9ff]/40 rounded-full blur-2xl animate-pulse"></div>
         <div className="absolute bottom-[-100px] right-[-60px] w-96 h-96 bg-[#ffd6e0]/40 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-[40%] left-[70%] w-60 h-60 bg-[#e0f7ff]/40 rounded-full blur-xl animate-pulse"></div>

@@ -9,7 +9,7 @@ export default function Login() {
   useEffect(() => {
     const storedUser = localStorage.getItem('loggedInUser');
     if (storedUser) {
-      navigate('/profile');
+      navigate('/account');
     }
   }, [navigate]);
 

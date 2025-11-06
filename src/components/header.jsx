@@ -8,15 +8,27 @@ function Header() {
   const [selected, setSelected] = useState(null);
   const navigate = useNavigate();
 
+  // Tjek localStorage ved mount
   useEffect(() => {
     const storedUser = localStorage.getItem('loggedInUser');
-    if (storedUser) setUser(storedUser);
+    if (storedUser) setUser(JSON.parse(storedUser));
+
+    // Lyt efter changes i localStorage
+    const handleStorageChange = () => {
+      const updatedUser = localStorage.getItem('loggedInUser');
+      setUser(updatedUser ? JSON.parse(updatedUser) : null);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('loggedInUser');
     setUser(null);
     navigate('/login');
+    window.dispatchEvent(new Event('storage')); // trigger re-render
   };
 
   const options = [
@@ -71,15 +83,17 @@ function Header() {
           menuClassName="
             absolute mt-2 w-56 rounded-2xl bg-white shadow-xl ring-1 ring-black/5 p-2 z-50"
           placeholderClassName="font-medium text-black"
-        >
-        </Dropdown>
+        />
 
         <a href="/contact" className="text-black-800 font-medium hover:text-black-600 transition h-full flex items-center">
           Kontakt
         </a>
 
         {user ? (
-          <button onClick={handleLogout} className="text-red-600 font-semibold hover:text-red-800 transition h-full flex items-center">
+          <button
+            onClick={handleLogout}
+            className="text-red-600 font-semibold hover:text-red-800 transition h-full flex items-center"
+          >
             Log ud
           </button>
         ) : (
