@@ -4,16 +4,12 @@ export default function Account() {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('loggedInUser');
-    const allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
-
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      const userInfo = allUsers[parsedUser.username];
-
-      if (userInfo) {
-        setUserData(userInfo);
-      }
+    try {
+      const raw = localStorage.getItem('loggedInUser');
+      if (!raw) return;
+      setUserData(JSON.parse(raw));
+    } catch {
+      // optionally clear bad data or redirect
     }
   }, []);
 
