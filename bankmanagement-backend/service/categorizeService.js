@@ -389,3 +389,7 @@ export function findCompanyByAccount(regNo, accNo, description = "") {
         accNo
     };
 }
+
+export function getCategories() {
+  return categories;
+}
