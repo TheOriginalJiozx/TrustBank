@@ -1,25 +1,56 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function Post() {
-  const [responseData, setResponseData] = useState(null);
+export default function Post() {
+  const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
-    company: "",
     accNo: "",
     regNo: "",
     amount: "",
-    category: "",
     comment: "",
+    company: "",
+    category: "",
   });
-
-  const [user, setUser] = useState(null);
+  const [responseData, setResponseData] = useState(null);
   const navigate = useNavigate();
 
+  // Hent brugerdata fra localStorage og backend
   useEffect(() => {
-    const storedUser = localStorage.getItem('loggedInUser');
-    if (!storedUser) {
-      navigate('/');
+    const raw = localStorage.getItem("loggedInUser");
+    if (!raw) return navigate("/");
+
+    let storedUser;
+    try {
+      storedUser = JSON.parse(raw);
+    } catch {
+      console.error("Ugyldigt data i localStorage");
+      return navigate("/");
     }
+
+    const username = Array.isArray(storedUser)
+      ? storedUser[0]?.username
+      : storedUser?.username;
+
+    if (!username) {
+      console.error("Brugernavn mangler i localStorage");
+      return navigate("/");
+    }
+
+    fetch(`http://localhost:3001/api/users?username=${username}`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Kunne ikke hente brugerdata");
+        return res.json();
+      })
+      .then((data) => {
+        // Gem data som array for konsistens med andre sider
+        const userArray = Array.isArray(data) ? data : [data];
+        setUser(userArray[0]);
+        localStorage.setItem("loggedInUser", JSON.stringify(userArray));
+      })
+      .catch((err) => {
+        console.error("Fejl ved hentning af brugerdata:", err);
+        navigate("/");
+      });
   }, [navigate]);
 
   const handleChange = (e) => {
@@ -29,56 +60,69 @@ function Post() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) return;
 
     let updatedFormData = { ...formData };
 
+    // Find company info
     try {
       const res = await fetch(
-        `http://localhost:3001/api/findCompany?regNo=${formData.regNo}&accNo=${formData.accNo}&comment=${encodeURIComponent(formData.comment)}`
+        `http://localhost:3001/api/findCompany?regNo=${formData.regNo}&accNo=${formData.accNo}&comment=${encodeURIComponent(
+          formData.comment
+        )}`
       );
-
       if (res.ok) {
         const company = await res.json();
-        if (company) {
-          updatedFormData.company = company.name;
-          updatedFormData.category = company.category;
-        } else {
-          updatedFormData.company = "Ukendt";
-        }
+        updatedFormData.company = company?.name || "Ukendt";
+        updatedFormData.category = company?.category || "Ukendt kategori";
+      } else {
+        updatedFormData.company = "Ukendt";
+        updatedFormData.category = "Ukendt kategori";
       }
-    } catch (err) {
-      console.log("Virksomheden findes ikke", err);
+    } catch {
       updatedFormData.company = "Ukendt";
+      updatedFormData.category = "Ukendt kategori";
     }
 
+    // Send transaction til backend
     try {
-      const res = await fetch("http://localhost:3001/api/transactions/posttransactions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedFormData),
-      });
+      const res = await fetch(
+        "http://localhost:3001/api/transactions/posttransactions",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            company: updatedFormData.company, // 🔹 send company med
+            category: updatedFormData.category, // hvis du også vil gemme kategori
+            senderRegNo: user.regNo,
+            senderAccNo: user.accNo,
+            receiverRegNo: formData.regNo,
+            receiverAccNo: formData.accNo,
+            amount: formData.amount,
+            comment: formData.comment,
+          }),
+        }
+      );
 
       const data = await res.json();
       setResponseData(data);
 
-      const storedUser = localStorage.getItem("loggedInUser");
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        const userKey = `transactions_${user.username}`;
+      // Opdater local user med transaktionen
+      const updatedUser = { ...user };
+      updatedUser.transactions = updatedUser.transactions || [];
+      updatedUser.transactions.push({
+        ...updatedFormData,
+        timestamp: new Date().toISOString(),
+      });
 
-        const existingTransactions = JSON.parse(localStorage.getItem(userKey)) || [];
-
-        existingTransactions.push({
-          ...updatedFormData,
-          timestamp: new Date().toISOString()
-        });
-
-        localStorage.setItem(userKey, JSON.stringify(existingTransactions));
-      }
+      setUser(updatedUser);
+      localStorage.setItem("loggedInUser", JSON.stringify([updatedUser]));
     } catch (error) {
       setResponseData({ error: "Noget gik galt med overførslen." });
     }
   };
+
+  if (!user) return <p className="p-6 text-center">Indlæser bruger...</p>;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8f9fb] text-slate-800 font-sans">
@@ -151,10 +195,12 @@ function Post() {
               />
             </div>
 
-            <button type="submit" className="bg-[#003366] text-white py-2 px-4 rounded hover:bg-[#002244] transition">
+            <button
+              type="submit"
+              className="bg-[#003366] text-white py-2 px-4 rounded hover:bg-[#002244] transition"
+            >
               Overfør
             </button>
-
           </fieldset>
         </form>
 
@@ -166,14 +212,7 @@ function Post() {
             </pre>
           </div>
         )}
-
-        <br />
-        <div className="absolute top-[-80px] left-[-40px] w-72 h-72 bg-[#d0e9ff]/40 rounded-full blur-2xl animate-pulse"></div>
-        <div className="absolute bottom-[-100px] right-[-60px] w-96 h-96 bg-[#ffd6e0]/40 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-[40%] left-[70%] w-60 h-60 bg-[#e0f7ff]/40 rounded-full blur-xl animate-pulse"></div>
       </main>
     </div>
   );
 }
-
-export default Post;

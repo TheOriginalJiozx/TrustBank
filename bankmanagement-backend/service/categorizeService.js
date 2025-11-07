@@ -2,11 +2,74 @@ import fs from "fs";
 import path from "path";
 import stringSimilarity from "string-similarity";
 
-const usersFile = path.join(process.cwd(), "data", "users.json");
-const users = JSON.parse(fs.readFileSync(usersFile, "utf-8"));
+// Path til users.json
+const filePath = path.join(process.cwd(), "data", "users.json");
 
-let categories = {
-  "Mad & Drikke": {
+// Load users.json dynamisk
+function loadUsersData() {
+  try {
+    const raw = fs.readFileSync(filePath, "utf8");
+    return raw ? JSON.parse(raw) : {};
+  } catch (err) {
+    console.error("Fejl ved læsning af users.json:", err);
+    return {};
+  }
+}
+
+// Normalisering af tekst
+function normalize(text) {
+  return String(text || "").toLowerCase().replace(/[.,']/g, "");
+}
+
+// Direkte substring-match
+function directMatch(description, categories) {
+  if (!description) return null;
+  const descNorm = normalize(description);
+  let matches = [];
+
+  for (const [category, { companies, priority }] of Object.entries(categories)) {
+    for (const company of companies) {
+      if (descNorm.includes(normalize(company.name))) {
+        matches.push({ category, priority });
+        break;
+      }
+    }
+  }
+
+  if (matches.length === 0) return null;
+  matches.sort((a, b) => a.priority - b.priority);
+  return matches[0].category;
+}
+
+// Fuzzy-match
+function fuzzyMatch(description, categories) {
+  if (!description) return null;
+  const descNorm = normalize(description);
+  let bestMatch = { category: null, score: 0 };
+
+  for (const [category, { companies }] of Object.entries(categories)) {
+    for (const company of companies) {
+      const similarity = stringSimilarity.compareTwoStrings(descNorm, normalize(company.name));
+      if (similarity > bestMatch.score) bestMatch = { category, score: similarity };
+    }
+  }
+
+  return bestMatch.score >= 0.3 ? bestMatch.category : null;
+}
+
+// Check om reg+acc er kunde
+function isCustomerByAccount(regNo, accNo, usersData) {
+  regNo = String(regNo);
+  accNo = String(accNo);
+  return Object.values(usersData).some(userArr =>
+    userArr.some(u => String(u.regNo) === regNo && String(u.accNo) === accNo)
+  );
+}
+
+// Byg kategorier inkl. dynamisk Kunde
+function buildCategories(usersData) {
+  const categories = {
+    "Mad & Drikke": {
     priority: 1,
     companies: [
       { name: "Netto", regNo: "3348", accNo: "71920483" },
@@ -315,96 +378,64 @@ let categories = {
       { name: "Dagpenge", regNo: "4567", accNo: "71920358" },
       { name: "Sygedagpenge", regNo: "4578", accNo: "50817294" }
     ]
-  },
-};
-
-categories["Kunde"] = {
-  priority: 0,
-  companies: Object.values(users).map(user => ({
-    name: "Kunde",
-    regNo: user.regNo,
-    accNo: user.accNo
-  }))
-};
-
-function normalize(text) {
-  return text.toLowerCase().replace(/[.,']/g, '');
-}
-
-const userArray = Object.values(users);
-
-function isCustomerByAccount(regNo, accNo) {
-  return userArray.some(
-    (u) => String(u.regNo) === String(regNo) && String(u.accNo) === String(accNo)
-  );
-}
-
-function directMatch(description) {
-  const descNorm = normalize(description);
-  let matches = [];
-  for (const [category, { companies, priority }] of Object.entries(categories)) {
-    for (const company of companies) {
-      if (descNorm.includes(normalize(company.name))) {
-        matches.push({ category, priority });
-        break;
-      }
-    }
   }
-  if (matches.length === 0) return null;
-  matches.sort((a, b) => a.priority - b.priority);
-  return matches[0].category;
+  };
+
+  // Dynamisk Kunde-kategori
+  categories["Kunde"] = {
+    priority: 0,
+    companies: Object.values(usersData).flatMap(userArr =>
+      userArr.map(u => ({ name: "Kunde", regNo: u.regNo, accNo: u.accNo }))
+    )
+  };
+
+  return categories;
 }
 
-function fuzzyMatch(description) {
-  if (!description) return null;
-  const descNorm = normalize(description);
-  let bestMatch = { category: null, score: 0 };
-  for (const [category, { companies }] of Object.entries(categories)) {
-    for (const company of companies) {
-      const similarity = stringSimilarity.compareTwoStrings(descNorm, normalize(company.name));
-      if (similarity > bestMatch.score) {
-        bestMatch = { category, score: similarity };
-      }
-    }
-  }
-  return bestMatch.score >= 0.80 ? bestMatch.category : null;
-}
-
-export function categorizeTransaction(description, regNo = null, accNo = null) {
-  const isCustomer = regNo && accNo && isCustomerByAccount(regNo, accNo);
-  let category = (!isCustomer || !description) ? directMatch(description) : null;
-  const fuzzyCategory = fuzzyMatch(description);
-  if (fuzzyCategory) category = fuzzyCategory;
-  if (!category && isCustomer) category = "Kunde";
-  return category || "Ukendt kategori";
-}
-
+// Find company inkl. kategori
 export function findCompanyByAccount(regNo, accNo, description = "") {
-  const isCustomer = isCustomerByAccount(regNo, accNo);
-  if (!isCustomer) {
-    for (const [category, { companies }] of Object.entries(categories)) {
-      const company = companies.find(
-        (c) => String(c.regNo) === String(regNo) && String(c.accNo) === String(accNo)
-      );
-      if (company) {
-        return { name: company.name, category, regNo, accNo, comment: description };
-      }
-    }
-  }
-  if (description) {
-    const fuzzyCategory = fuzzyMatch(description);
-    if (fuzzyCategory) {
+  const usersData = loadUsersData();
+  const categories = buildCategories(usersData);
+
+  const isCustomer = isCustomerByAccount(regNo, accNo, usersData);
+
+  // 1. Tjek om det er en kendt virksomhed i categories
+  for (const [category, { companies }] of Object.entries(categories)) {
+    const company = companies.find(
+      c => String(c.regNo) === String(regNo) && String(c.accNo) === String(accNo)
+    );
+    if (company) {
       return {
-        name: isCustomer ? "Kunde" : "Ukendt virksomhed",
-        category: fuzzyCategory,
+        name: company.name,
+        category,
         regNo,
         accNo,
         comment: description
       };
     }
   }
+
+  // 2. Beskrivelse match
+  let category = directMatch(description, categories);
+  if (!category) category = fuzzyMatch(description, categories);
+
+  // 3. Kunde
   if (isCustomer) {
-    return { name: "Kunde", category: "Kunde", regNo, accNo, comment: description };
+    return {
+      name: "Kunde",
+      category: "Kunde",
+      regNo,
+      accNo,
+      comment: description
+    };
   }
-  return { name: "Ukendt virksomhed", category: "Ukendt kategori", regNo, accNo, comment: description };
+
+  // 4. Ukendt
+  return {
+    name: "Ukendt virksomhed",
+    category: category || "Ukendt kategori",
+    regNo,
+    accNo,
+    comment: description
+  };
 }

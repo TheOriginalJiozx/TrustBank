@@ -9,6 +9,7 @@ import Account from "./pages/account";
 import Transfer from "./pages/transaction/transfer"
 import Transactions from './pages/transactions';
 import Accounts from "./pages/accounts";
+import Cardusage from "./pages/cardusage";
 
 function App() {
     useEffect(() => {
@@ -31,6 +32,7 @@ function App() {
                     <Route path="/transactions" element={<Transactions />} />
                     <Route path="/account" element={<Account />} />
                     <Route path="/accounts" element={<Accounts />} />
+                    <Route path="/cardusage" element={<Cardusage />} />
                 </Routes>
             </main>
 
