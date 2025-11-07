@@ -85,7 +85,7 @@ export default function Cardusage() {
                 </div>
                 <div>
                   <p className="text-xs opacity-70">CVV</p>
-                  <p className="font-semibold">***</p>
+                  <p className="font-semibold">{card.cvv}</p>
                 </div>
               </div>
             </div>

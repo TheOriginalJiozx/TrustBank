@@ -14,7 +14,6 @@ export default function Post() {
   const [responseData, setResponseData] = useState(null);
   const navigate = useNavigate();
 
-  // Hent brugerdata fra localStorage og backend
   useEffect(() => {
     const raw = localStorage.getItem("loggedInUser");
     if (!raw) return navigate("/");
@@ -42,7 +41,6 @@ export default function Post() {
         return res.json();
       })
       .then((data) => {
-        // Gem data som array for konsistens med andre sider
         const userArray = Array.isArray(data) ? data : [data];
         setUser(userArray[0]);
         localStorage.setItem("loggedInUser", JSON.stringify(userArray));
@@ -59,32 +57,30 @@ export default function Post() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!user) return;
+  e.preventDefault();
+  if (!user) return;
 
-    let updatedFormData = { ...formData };
+  let updatedFormData = { ...formData };
 
-    // Find company info
-    try {
-      const res = await fetch(
-        `http://localhost:3001/api/findCompany?regNo=${formData.regNo}&accNo=${formData.accNo}&comment=${encodeURIComponent(
-          formData.comment
-        )}`
-      );
-      if (res.ok) {
-        const company = await res.json();
-        updatedFormData.company = company?.name || "Ukendt";
-        updatedFormData.category = company?.category || "Ukendt kategori";
-      } else {
-        updatedFormData.company = "Ukendt";
-        updatedFormData.category = "Ukendt kategori";
-      }
-    } catch {
+  // --- Find virksomhed/få kategori ---
+  try {
+    const res = await fetch(
+      `http://localhost:3001/api/findCompany?regNo=${formData.regNo}&accNo=${formData.accNo}&comment=${encodeURIComponent(formData.comment)}`
+    );
+    if (res.ok) {
+      const company = await res.json();
+      updatedFormData.company = company?.name || "Ukendt";
+      updatedFormData.category = company?.category || "Ukendt kategori";
+    } else {
       updatedFormData.company = "Ukendt";
       updatedFormData.category = "Ukendt kategori";
     }
+  } catch {
+    updatedFormData.company = "Ukendt";
+    updatedFormData.category = "Ukendt kategori";
+  }
 
-    // Send transaction til backend
+  // --- Post transaktionen ---
     try {
       const res = await fetch(
         "http://localhost:3001/api/transactions/posttransactions",
@@ -92,8 +88,9 @@ export default function Post() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            company: updatedFormData.company, // 🔹 send company med
-            category: updatedFormData.category, // hvis du også vil gemme kategori
+            company: updatedFormData.company,
+            category: updatedFormData.category,
+            senderUsername: user.username, // <--- brug username som sender
             senderRegNo: user.regNo,
             senderAccNo: user.accNo,
             receiverRegNo: formData.regNo,
@@ -107,17 +104,27 @@ export default function Post() {
       const data = await res.json();
       setResponseData(data);
 
-      // Opdater local user med transaktionen
+      // --- Opdater afsenderens lokale transaktioner ---
       const updatedUser = { ...user };
       updatedUser.transactions = updatedUser.transactions || [];
-      updatedUser.transactions.push({
-        ...updatedFormData,
-        timestamp: new Date().toISOString(),
-      });
+      if (data.sent) {
+        updatedUser.transactions.push({
+          ...updatedFormData,
+          timestamp: data.sent.timestamp,
+          type: "sent",
+        });
+      }
 
       setUser(updatedUser);
       localStorage.setItem("loggedInUser", JSON.stringify([updatedUser]));
+
+      // --- Hvis der er modtager-transaktion (andre brugere), kan du evt. logge den ---
+      if (data.received) {
+        console.log("Modtager-transaktion oprettet:", data.received);
+        // data.received har nu "sender: username" i stedet for regNo/accNo
+      }
     } catch (error) {
+      console.error("Fejl ved overførsel:", error);
       setResponseData({ error: "Noget gik galt med overførslen." });
     }
   };

@@ -8,12 +8,23 @@
       "cvv": "714",
       "transactions": [
         {
-          "company": "Ukendt virksomhed",
-          "receiverRegNo": "3602",
-          "receiverAccNo": "90217437",
-          "amount": "11",
+          "company": "Kunde",
+          "category": "Kunde",
+          "receiverRegNo": "8439",
+          "receiverAccNo": "7829223060",
+          "amount": "1",
           "comment": "11",
-          "timestamp": "2025-11-07T15:06:14.393Z"
+          "timestamp": "2025-11-07T19:39:30.777Z",
+          "type": "sent"
+        },
+        {
+          "company": "Kunde",
+          "category": "Kunde",
+          "sender": "TheOriginalJiozx",
+          "amount": "1",
+          "comment": "11",
+          "timestamp": "2025-11-07T19:39:30.777Z",
+          "type": "received"
         }
       ]
     },
@@ -25,11 +36,13 @@
       "cvv": "749",
       "transactions": [
         {
-          "receiverRegNo": "3602",
-          "receiverAccNo": "90217438",
-          "amount": "11",
-          "comment": "1",
-          "timestamp": "2025-11-07T14:40:42.518Z"
+          "company": "Netto",
+          "category": "Mad & Drikke",
+          "receiverRegNo": "3348",
+          "receiverAccNo": "71920483",
+          "amount": "1",
+          "comment": "Netto",
+          "timestamp": "2025-11-07T18:12:25.790Z"
         }
       ]
     }
@@ -41,7 +54,35 @@
       "accNo": "5297999968",
       "cardNo": "7508149792527889",
       "cvv": "412",
-      "transactions": []
+      "transactions": [
+        {
+          "company": "Kunde",
+          "category": "Kunde",
+          "senderRegNo": "8439",
+          "senderAccNo": "7829223060",
+          "amount": "1",
+          "comment": "11",
+          "timestamp": "2025-11-07T19:35:07.800Z",
+          "type": "received"
+        },
+        {
+          "company": "Kunde",
+          "category": "Kunde",
+          "amount": "1",
+          "comment": "11",
+          "timestamp": "2025-11-07T19:36:23.958Z",
+          "type": "received"
+        },
+        {
+          "company": "Kunde",
+          "category": "Kunde",
+          "sender": "TheOriginalJiozx",
+          "amount": "1",
+          "comment": "11",
+          "timestamp": "2025-11-07T19:38:50.482Z",
+          "type": "received"
+        }
+      ]
     }
   ]
 }

@@ -16,56 +16,6 @@ function loadUsersData() {
   }
 }
 
-// Normalisering af tekst
-function normalize(text) {
-  return String(text || "").toLowerCase().replace(/[.,']/g, "");
-}
-
-// Direkte substring-match
-function directMatch(description, categories) {
-  if (!description) return null;
-  const descNorm = normalize(description);
-  let matches = [];
-
-  for (const [category, { companies, priority }] of Object.entries(categories)) {
-    for (const company of companies) {
-      if (descNorm.includes(normalize(company.name))) {
-        matches.push({ category, priority });
-        break;
-      }
-    }
-  }
-
-  if (matches.length === 0) return null;
-  matches.sort((a, b) => a.priority - b.priority);
-  return matches[0].category;
-}
-
-// Fuzzy-match
-function fuzzyMatch(description, categories) {
-  if (!description) return null;
-  const descNorm = normalize(description);
-  let bestMatch = { category: null, score: 0 };
-
-  for (const [category, { companies }] of Object.entries(categories)) {
-    for (const company of companies) {
-      const similarity = stringSimilarity.compareTwoStrings(descNorm, normalize(company.name));
-      if (similarity > bestMatch.score) bestMatch = { category, score: similarity };
-    }
-  }
-
-  return bestMatch.score >= 0.3 ? bestMatch.category : null;
-}
-
-// Check om reg+acc er kunde
-function isCustomerByAccount(regNo, accNo, usersData) {
-  regNo = String(regNo);
-  accNo = String(accNo);
-  return Object.values(usersData).some(userArr =>
-    userArr.some(u => String(u.regNo) === regNo && String(u.accNo) === accNo)
-  );
-}
-
 // Byg kategorier inkl. dynamisk Kunde
 function buildCategories(usersData) {
   const categories = {
@@ -381,7 +331,6 @@ function buildCategories(usersData) {
   }
   };
 
-  // Dynamisk Kunde-kategori
   categories["Kunde"] = {
     priority: 0,
     companies: Object.values(usersData).flatMap(userArr =>
@@ -392,46 +341,74 @@ function buildCategories(usersData) {
   return categories;
 }
 
-// Find company inkl. kategori
 export function findCompanyByAccount(regNo, accNo, description = "") {
+  regNo = String(regNo).trim();
+  accNo = String(accNo).trim();
+
   const usersData = loadUsersData();
   const categories = buildCategories(usersData);
 
-  const isCustomer = isCustomerByAccount(regNo, accNo, usersData);
-
-  // 1. Tjek om det er en kendt virksomhed i categories
+  // --- 1️⃣ DIRECT MATCH --- (inkl. Kunde)
   for (const [category, { companies }] of Object.entries(categories)) {
     const company = companies.find(
-      c => String(c.regNo) === String(regNo) && String(c.accNo) === String(accNo)
+      c => String(c.regNo).trim() === regNo && String(c.accNo).trim() === accNo
     );
     if (company) {
-      return {
-        name: company.name,
-        category,
-        regNo,
-        accNo,
-        comment: description
-      };
+      if (category === "Kunde") {
+        // Kunde fra users.json: behold regNo/accNo korrekt
+        return {
+          name: "Kunde",
+          category: "Kunde",
+          regNo: company.regNo,
+          accNo: company.accNo,
+          comment: description,
+          matchType: "Direct match (Kunde)",
+        };
+      } else {
+        // Virksomhed
+        return {
+          name: company.name,
+          category,
+          regNo,
+          accNo,
+          matchType: "Direct match (Company)",
+        };
+      }
     }
   }
 
-  // 2. Beskrivelse match
-  let category = directMatch(description, categories);
-  if (!category) category = fuzzyMatch(description, categories);
+  // --- 2️⃣ FUZZY MATCH (kun til info, ikke Kunde) ---
+  const allCompanies = Object.entries(categories)
+    .filter(([category]) => category !== "Kunde")
+    .flatMap(([category, { companies }]) => companies.map(c => ({ ...c, category })));
 
-  // 3. Kunde
-  if (isCustomer) {
+  const names = allCompanies.map(c => c.name);
+  const { bestMatch, bestMatchIndex } = stringSimilarity.findBestMatch(description, names);
+
+  if (bestMatch.rating > 0.8) {
+    const bestCompany = allCompanies[bestMatchIndex];
     return {
-      name: "Kunde",
-      category: "Kunde",
+      name: "Ukendt virksomhed",
+      category: bestCompany.category,
       regNo,
       accNo,
-      comment: description
+      matchType: "Fuzzy match",
     };
   }
-  return { name: "Ukendt virksomhed", category: "Ukendt kategori", regNo, accNo, comment: description };
+
+  // --- 3️⃣ Intet match ---
+  return {
+    name: "Ukendt virksomhed",
+    category: "Ukendt kategori",
+    regNo,
+    accNo,
+    comment: description,
+    matchType: "None",
+  };
 }
 
+// 👇 Denne funktion skal eksporteres
 export function getCategories() {
-  return categories;
+  const usersData = loadUsersData();
+  return buildCategories(usersData);
 }
