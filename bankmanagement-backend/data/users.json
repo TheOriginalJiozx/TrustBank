@@ -1,12 +1,47 @@
 {
-  "TheOriginalJiozx": {
-    "username": "TheOriginalJiozx",
-    "regNo": "1680",
-    "accNo": "91291271"
-  },
-  "Alice": {
-    "username": "Alice",
-    "regNo": "5308",
-    "accNo": "53914047"
-  }
+  "TheOriginalJiozx": [
+    {
+      "username": "TheOriginalJiozx",
+      "regNo": "8439",
+      "accNo": "7829223060",
+      "cardNo": "9636249426885700",
+      "cvv": "714",
+      "transactions": [
+        {
+          "company": "Ukendt virksomhed",
+          "receiverRegNo": "3602",
+          "receiverAccNo": "90217437",
+          "amount": "11",
+          "comment": "11",
+          "timestamp": "2025-11-07T15:06:14.393Z"
+        }
+      ]
+    },
+    {
+      "username": "TheOriginalJiozx",
+      "regNo": "8433",
+      "accNo": "7822323060",
+      "cardNo": "9636249426485700",
+      "cvv": "749",
+      "transactions": [
+        {
+          "receiverRegNo": "3602",
+          "receiverAccNo": "90217438",
+          "amount": "11",
+          "comment": "1",
+          "timestamp": "2025-11-07T14:40:42.518Z"
+        }
+      ]
+    }
+  ],
+  "TesterOmar": [
+    {
+      "username": "TesterOmar",
+      "regNo": "5778",
+      "accNo": "5297999968",
+      "cardNo": "7508149792527889",
+      "cvv": "412",
+      "transactions": []
+    }
+  ]
 }

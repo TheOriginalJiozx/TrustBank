@@ -2,7 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import NextCors from 'nextjs-cors';
 
-const filePath = path.join(process.cwd(), 'data', 'users.json');
+const dirPath = path.join(process.cwd(), 'data');
+const filePath = path.join(dirPath, 'users.json');
 
 export default async function handler(req, res) {
   try {
@@ -12,6 +13,12 @@ export default async function handler(req, res) {
       optionsSuccessStatus: 200,
     });
 
+    // 🔹 Sørg for at mappen "data" findes
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    // 🔹 Sørg for at filen "users.json" findes
     if (!fs.existsSync(filePath)) {
       fs.writeFileSync(filePath, JSON.stringify({}, null, 2));
     }
@@ -44,17 +51,15 @@ export default async function handler(req, res) {
 
       if (!users[username]) {
         const regNo = String(Math.floor(1000 + Math.random() * 9000));
-        const accNo = String(Math.floor(10000000 + Math.random() * 90000000));
-        users[username] = { username, regNo, accNo };
+        const accNo = String(Math.floor(1000000000 + Math.random() * 9000000000));
+        const cardNo = String(Math.floor(1000000000000000 + Math.random() * 9000000000000000));
+        const cvv = String(Math.floor(100 + Math.random() * 900));
+        users[username] = { username, regNo, accNo, cardNo, cvv };
 
         fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
       }
 
       return res.status(200).json(users[username]);
-    }
-
-    if (req.method === 'GET') {
-      return res.status(200).json(users);
     }
 
     res.status(405).json({ message: 'Method not allowed' });

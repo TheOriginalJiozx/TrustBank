@@ -9,19 +9,5 @@ export const transactionRepository = {
         const newTransaction = { id: Date.now().toString(), ...transaction };
         transactionsArray.push(newTransaction);
         return newTransaction;
-    },
-
-    update: (id, updated) => {
-        const index = transactionsArray.findIndex(t => t.id === id);
-        if (index === -1) return null;
-        transactionsArray[index] = { ...transactionsArray[index], ...updated };
-        return transactionsArray[index];
-    },
-
-    delete: (id) => {
-        const index = transactionsArray.findIndex(t => t.id === id);
-        if (index === -1) return false;
-        transactionsArray.splice(index, 1);
-        return true;
     }
 }

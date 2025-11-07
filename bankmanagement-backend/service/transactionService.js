@@ -11,9 +11,5 @@ export const transactionService = {
             transaction.category = categorizeTransaction(transaction.description);
         }
         return transactionRepository.create(transaction);
-    },
-
-    update: (id, updated) => transactionRepository.update(id, updated),
-
-    delete: (id) => transactionRepository.delete(id)
+    }
 };

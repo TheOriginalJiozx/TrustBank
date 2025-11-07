@@ -28,14 +28,32 @@ export default function Me() {
 
     fetch(`http://localhost:3001/api/users?username=${urlUser}`)
       .then(async res => {
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Bruger findes ikke');
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem('loggedInUser', JSON.stringify(data));
+          window.dispatchEvent(new Event('storage'));
+          navigate('/account', { replace: true });
+          return;
         }
-        return res.json();
+
+        const errorData = await res.json().catch(() => ({}));
+        if (res.status === 404 || (errorData.message && errorData.message.includes('findes ikke'))) {
+          console.warn('Bruger findes ikke — opretter ny bruger...');
+          return fetch('http://localhost:3001/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: urlUser }),
+          });
+        }
+
+        throw new Error(errorData.message || 'Uventet fejl ved brugeropslag');
       })
-      .then(data => {
-        localStorage.setItem('loggedInUser', JSON.stringify(data));
+      .then(async res => {
+        if (!res) return;
+        if (!res.ok) throw new Error('Kunne ikke oprette bruger');
+
+        const newUser = await res.json();
+        localStorage.setItem('loggedInUser', JSON.stringify(newUser));
         window.dispatchEvent(new Event('storage'));
         navigate('/account', { replace: true });
       })
