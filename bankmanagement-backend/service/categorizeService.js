@@ -408,3 +408,7 @@ export function findCompanyByAccount(regNo, accNo, description = "") {
   }
   return { name: "Ukendt virksomhed", category: "Ukendt kategori", regNo, accNo, comment: description };
 }
+
+export function getCategories() {
+  return categories;
+}
