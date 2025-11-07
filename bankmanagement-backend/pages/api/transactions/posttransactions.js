@@ -1,45 +1,41 @@
 import NextCors from "nextjs-cors";
-
-async function getCompanyName(regNo, accNo, description = "") {
-  try {
-    const res = await fetch(
-      `http://localhost:3001/api/findCompany?regNo=${regNo}&accNo=${accNo}&description=${encodeURIComponent(description)}`
-    );
-    if (!res.ok) throw new Error("Netværksfejl");
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    console.error("Virksomheden findes ikke", err);
-    return {
-      name: description || "Ukendt firma",
-      category: "Ukendt kategori",
-      regNo,
-      accNo
-    };
-  }
-}
+import { findCompanyByAccount } from '../../../service/categorizeService';
 
 export default async function handler(req, res) {
   await NextCors(req, res, {
-    methods: ["POST"],
+    methods: ["POST", "OPTIONS"],
     origin: "http://localhost:3000",
+    optionsSuccessStatus: 200,
   });
 
-  if (req.method === "POST") {
-    const { regNo, accNo, description } = req.body;
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Metode ikke tilladt" });
+  }
 
-    try {
-      const company = await getCompanyName(regNo, accNo, description);
+  const { regNo, accNo, comment } = req.body;
 
-      res.status(200).json({
-        status: "success",
-        data: { company },
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ status: "error", message: "Kunne ikke hente virksomhed" });
-    }
-  } else {
-    res.status(405).json({ error: "Metode ikke tilladt" });
+  if (!regNo || !accNo) {
+    return res.status(400).json({ error: "regNo og accNo skal angives" });
+  }
+
+  try {
+    const company = findCompanyByAccount(String(regNo), String(accNo), comment || "");
+
+    return res.status(200).json({
+      name: company.name,
+      category: company.category,
+      regNo: company.regNo,
+      accNo: company.accNo,
+      comment: comment || company.comment || ""
+    });
+  } catch (err) {
+    console.error("Fejl i posttransactions API:", err);
+    return res.status(500).json({
+      name: comment || "Ukendt firma",
+      category: "Ukendt kategori",
+      regNo,
+      accNo,
+      comment: comment || ""
+    });
   }
 }

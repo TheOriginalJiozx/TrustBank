@@ -1,4 +1,4 @@
-let transactionsArray = []; // midlertidig storage
+let transactionsArray = [];
 
 export const transactionRepository = {
     findAll: () => transactionsArray,

@@ -35,7 +35,7 @@ function Home() {
           <div className="flex gap-6 flex-wrap justify-center mb-12">
             {!user && (
               <a href="/login">
-                <button class="px-8 py-3 rounded-xl bg-[#003366] text-white font-semibold shadow-md hover:bg-[#00264d] transition-all duration-300">
+                <button className="px-8 py-3 rounded-xl bg-[#003366] text-white font-semibold shadow-md hover:bg-[#00264d] transition-all duration-300">
                   Log ind
                 </button>
               </a>

@@ -1,4 +1,9 @@
+import fs from "fs";
+import path from "path";
 import stringSimilarity from "string-similarity";
+
+const usersFile = path.join(process.cwd(), "data", "users.json");
+const users = JSON.parse(fs.readFileSync(usersFile, "utf-8"));
 
 let categories = {
   "Mad & Drikke": {
@@ -313,83 +318,93 @@ let categories = {
   },
 };
 
+categories["Kunde"] = {
+  priority: 0,
+  companies: Object.values(users).map(user => ({
+    name: "Kunde",
+    regNo: user.regNo,
+    accNo: user.accNo
+  }))
+};
+
 function normalize(text) {
-  return text.toLowerCase();
+  return text.toLowerCase().replace(/[.,']/g, '');
+}
+
+const userArray = Object.values(users);
+
+function isCustomerByAccount(regNo, accNo) {
+  return userArray.some(
+    (u) => String(u.regNo) === String(regNo) && String(u.accNo) === String(accNo)
+  );
 }
 
 function directMatch(description) {
-    let matches = [];
-    for (const [category, { companies, priority }] of Object.entries(categories)) {
-        for (const company of companies) {
-            if (description.includes(company)) {
-                matches.push({ category, priority });
-                break;
-            }
-        }
+  const descNorm = normalize(description);
+  let matches = [];
+  for (const [category, { companies, priority }] of Object.entries(categories)) {
+    for (const company of companies) {
+      if (descNorm.includes(normalize(company.name))) {
+        matches.push({ category, priority });
+        break;
+      }
     }
-    if (matches.length === 0) return null;
-    matches.sort((a, b) => a.priority - b.priority);
-    return matches[0].category;
+  }
+  if (matches.length === 0) return null;
+  matches.sort((a, b) => a.priority - b.priority);
+  return matches[0].category;
 }
 
-export function fuzzyMatch(description) {
-    const desc = description.toLowerCase().replace(/[.,']/g, '');
-    const words = desc.split(/\s+/);
-
-    let bestCategory = null;
-    let bestScore = 0;
-
-    for (const [category, { companies }] of Object.entries(categories)) {
-        const companyNames = companies.map(c => c.name.toLowerCase());
-        for (let word of words) {
-            const match = stringSimilarity.findBestMatch(word, companyNames);
-            if (match.bestMatch.rating > bestScore) {
-                bestScore = match.bestMatch.rating;
-                bestCategory = category;
-            }
-        }
+function fuzzyMatch(description) {
+  if (!description) return null;
+  const descNorm = normalize(description);
+  let bestMatch = { category: null, score: 0 };
+  for (const [category, { companies }] of Object.entries(categories)) {
+    for (const company of companies) {
+      const similarity = stringSimilarity.compareTwoStrings(descNorm, normalize(company.name));
+      if (similarity > bestMatch.score) {
+        bestMatch = { category, score: similarity };
+      }
     }
-
-    if (bestScore >= 0.45) return bestCategory;
-
-    return null;
+  }
+  return bestMatch.score >= 0.80 ? bestMatch.category : null;
 }
 
-export function categorizeTransaction(description) {
-    const descNorm = normalize(description);
-
-    let category = directMatch(descNorm);
-    if (category) return category;
-
-    category = fuzzyMatch(descNorm);
-    if (category) return category;
-
-    return "Ukendt kategori";
+export function categorizeTransaction(description, regNo = null, accNo = null) {
+  const isCustomer = regNo && accNo && isCustomerByAccount(regNo, accNo);
+  let category = (!isCustomer || !description) ? directMatch(description) : null;
+  const fuzzyCategory = fuzzyMatch(description);
+  if (fuzzyCategory) category = fuzzyCategory;
+  if (!category && isCustomer) category = "Kunde";
+  return category || "Ukendt kategori";
 }
 
 export function findCompanyByAccount(regNo, accNo, description = "") {
+  const isCustomer = isCustomerByAccount(regNo, accNo);
+  if (!isCustomer) {
     for (const [category, { companies }] of Object.entries(categories)) {
-        const company = companies.find(c => c.regNo === regNo && c.accNo === accNo);
-        if (company) {
-            return {
-                name: company.name,
-                category,
-                regNo,
-                accNo
-            };
-        }
+      const company = companies.find(
+        (c) => String(c.regNo) === String(regNo) && String(c.accNo) === String(accNo)
+      );
+      if (company) {
+        return { name: company.name, category, regNo, accNo, comment: description };
+      }
     }
-
-    const category = categorizeTransaction(description);
-
-    return {
-        name: description || "Ukendt firma",
-        category,
+  }
+  if (description) {
+    const fuzzyCategory = fuzzyMatch(description);
+    if (fuzzyCategory) {
+      return {
+        name: isCustomer ? "Kunde" : "Ukendt virksomhed",
+        category: fuzzyCategory,
         regNo,
-        accNo
-    };
-}
-
-export function getCategories() {
-  return categories;
+        accNo,
+        comment: description
+      };
+    }
+  }
+  if (isCustomer) {
+    return { name: "Kunde", category: "Kunde", regNo, accNo, comment: description };
+  }
+  return { name: "Ukendt virksomhed", category: "Ukendt kategori", regNo, accNo, comment: description };
 }
