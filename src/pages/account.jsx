@@ -12,7 +12,6 @@ export default function Account() {
       return;
     }
 
-    // Forvent at loggedInUser allerede er et array af kort til den aktuelle bruger
     try {
       const cards = JSON.parse(raw);
       if (Array.isArray(cards)) {

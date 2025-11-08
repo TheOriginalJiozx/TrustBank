@@ -16,7 +16,6 @@ function loadUsersData() {
   }
 }
 
-// Byg kategorier inkl. dynamisk Kunde
 function buildCategories(usersData) {
   const categories = {
     "Mad & Drikke": {

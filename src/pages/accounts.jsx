@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Accounts() {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("loggedInUser");
-    if (storedUser) setUser(storedUser);
+    const raw = localStorage.getItem("loggedInUser");
+
+    if (!raw) {
+      navigate('/login', { replace: true });
+    }
+
+    if (raw) setUser(raw);
   }, []);
 
   return (
@@ -18,13 +25,6 @@ export default function Accounts() {
           <p className="mt-4 text-lg text-[#4a4a4a]">
             Oversigtsside for konti, indskud og opsparing.
           </p>
-          {!user && (
-            <a href="/login" className="inline-block mt-6">
-              <button className="px-6 py-3 rounded-xl bg-[#003366] text-white font-semibold hover:bg-[#00264d] transition">
-                Log ind for at se dine konti
-              </button>
-            </a>
-          )}
         </div>
       </section>
 

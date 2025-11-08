@@ -11,6 +11,7 @@ export default function Cardusage() {
 
     if (!raw) {
       setLoading(false);
+      navigate('/login', { replace: true });
       return;
     }
 
@@ -22,9 +23,7 @@ export default function Cardusage() {
       setLoading(false);
       return;
     }
-
-    // Hvis det er et array med kort, brug det direkte
-    // Hvis det kun er et enkelt kortobjekt, pak det ind i array
+    
     const cards = Array.isArray(parsed) ? parsed : [parsed];
 
     setUserCards(cards);
@@ -32,7 +31,6 @@ export default function Cardusage() {
   }, []);
 
   const handleCardClick = (card) => {
-    // Navigate med query-param for kortnummer
     navigate(`/transactions?card=${card.cardNo}`);
   };
 

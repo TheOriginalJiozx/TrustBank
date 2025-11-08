@@ -1,8 +1,11 @@
 import fs from "fs";
 import path from "path";
 import NextCors from "nextjs-cors";
+import { useNavigate } from "react-router-dom";
 
 const filePath = path.join(process.cwd(), "data", "users.json");
+const [loading, setLoading] = useState(true);
+const navigate = useNavigate();
 
 export default async function handler(req, res) {
   await NextCors(req, res, {
@@ -10,6 +13,15 @@ export default async function handler(req, res) {
     methods: ["GET", "POST", "OPTIONS"],
     optionsSuccessStatus: 200,
   });
+
+  useEffect(() => {
+    const raw = localStorage.getItem("loggedInUser");
+    if (!raw) {
+      navigate('/login', { replace: true });
+      setLoading(false);
+      return;
+    }
+  }, []);
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
