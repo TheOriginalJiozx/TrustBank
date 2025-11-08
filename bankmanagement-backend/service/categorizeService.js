@@ -2,10 +2,8 @@ import fs from "fs";
 import path from "path";
 import stringSimilarity from "string-similarity";
 
-// Path til users.json
 const filePath = path.join(process.cwd(), "data", "users.json");
 
-// Load users.json dynamisk
 function loadUsersData() {
   try {
     const raw = fs.readFileSync(filePath, "utf8");
@@ -347,14 +345,12 @@ export function findCompanyByAccount(regNo, accNo, description = "") {
   const usersData = loadUsersData();
   const categories = buildCategories(usersData);
 
-  // --- 1️⃣ DIRECT MATCH --- (inkl. Kunde)
   for (const [category, { companies }] of Object.entries(categories)) {
     const company = companies.find(
       c => String(c.regNo).trim() === regNo && String(c.accNo).trim() === accNo
     );
     if (company) {
       if (category === "Kunde") {
-        // Kunde fra users.json: behold regNo/accNo korrekt
         return {
           name: "Kunde",
           category: "Kunde",
@@ -364,7 +360,6 @@ export function findCompanyByAccount(regNo, accNo, description = "") {
           matchType: "Direct match (Kunde)",
         };
       } else {
-        // Virksomhed
         return {
           name: company.name,
           category,
@@ -376,26 +371,30 @@ export function findCompanyByAccount(regNo, accNo, description = "") {
     }
   }
 
-  // --- 2️⃣ FUZZY MATCH (kun til info, ikke Kunde) ---
   const allCompanies = Object.entries(categories)
     .filter(([category]) => category !== "Kunde")
     .flatMap(([category, { companies }]) => companies.map(c => ({ ...c, category })));
 
   const names = allCompanies.map(c => c.name);
-  const { bestMatch, bestMatchIndex } = stringSimilarity.findBestMatch(description, names);
 
-  if (bestMatch.rating > 0.8) {
-    const bestCompany = allCompanies[bestMatchIndex];
-    return {
-      name: "Ukendt virksomhed",
-      category: bestCompany.category,
-      regNo,
-      accNo,
-      matchType: "Fuzzy match",
-    };
+  const words = description.split(/\s+/);
+
+  for (const word of words) {
+    const { bestMatch, bestMatchIndex } = stringSimilarity.findBestMatch(word, names);
+
+    if (bestMatch.rating > 0.8) {
+      const bestCompany = allCompanies[bestMatchIndex];
+      return {
+        name: "Ukendt virksomhed",
+        category: bestCompany.category,
+        regNo,
+        accNo,
+        matchWord: word,
+        matchType: "Fuzzy match (word)",
+      };
+    }
   }
 
-  // --- 3️⃣ Intet match ---
   return {
     name: "Ukendt virksomhed",
     category: "Ukendt kategori",
@@ -406,7 +405,6 @@ export function findCompanyByAccount(regNo, accNo, description = "") {
   };
 }
 
-// 👇 Denne funktion skal eksporteres
 export function getCategories() {
   const usersData = loadUsersData();
   return buildCategories(usersData);

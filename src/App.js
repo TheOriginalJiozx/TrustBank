@@ -10,7 +10,6 @@ import Transfer from "./pages/transaction/transfer";
 import Transactions from './pages/transactions';
 import Accounts from "./pages/accounts";
 import Cardusage from "./pages/cardusage";
-import DoesNotExist from './doesnotexist';
 
 function App() {
     useEffect(() => {
@@ -34,10 +33,6 @@ function App() {
                     <Route path="/account" element={<Account />} />
                     <Route path="/accounts" element={<Accounts />} />
                     <Route path="/cardusage" element={<Cardusage />} />
-
-                    <Route path="/404" element={<DoesNotExist />} />
-
-                    <Route path="*" element={<Navigate to="/404" replace />} />
                 </Routes>
             </main>
 
