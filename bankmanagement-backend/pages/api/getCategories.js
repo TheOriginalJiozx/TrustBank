@@ -1,4 +1,3 @@
-// pages/api/getCategories.js
 import NextCors from "nextjs-cors";
 import { getCategories } from "../../service/categorizeService";
 
