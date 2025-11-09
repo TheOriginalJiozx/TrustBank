@@ -252,9 +252,18 @@ export default function Post() {
 
           {showConfirmModal && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 text-center">
-                <h2 className="text-xl font-bold mb-4">Bekræft overførsel</h2>
-                <p className="mb-6">Har du husket at dobbelttjekke dine indtastninger?</p>
+              <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 text-left">
+                <h2 className="text-xl font-bold mb-4 text-center">Bekræft overførsel</h2>
+                <p className="mb-4">Har du husket at dobbelttjekke dine indtastninger?</p>
+
+                <div className="mb-6 space-y-2">
+                  <p><span className="font-semibold">FIK-nummer:</span> {formData.fikNo}</p>
+                  <p><span className="font-semibold">Reference nummer:</span> {formData.referenceNo}</p>
+                  <p><span className="font-semibold">Kreditor nummer:</span> {formData.creditorNo}</p>
+                  <p><span className="font-semibold">Beløb:</span> {formData.amount}</p>
+                  <p><span className="font-semibold">Kommentar:</span> {formData.comment || "-"}</p>
+                </div>
+
                 <div className="flex justify-center gap-4">
                   <button
                     onClick={() => {
