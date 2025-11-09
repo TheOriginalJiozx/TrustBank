@@ -20,7 +20,6 @@ export default async function handler(req, res) {
   if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
   if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, JSON.stringify({}, null, 2));
 
-  // load users
   let users = {};
   try {
     const data = fs.readFileSync(filePath, "utf8");
@@ -121,7 +120,6 @@ export default async function handler(req, res) {
         if (!Array.isArray(c.directDebits)) continue;
         const idx = c.directDebits.findIndex((d) => d.id === id);
         if (idx !== -1) {
-          // soft cancel
           c.directDebits[idx].active = false;
           c.directDebits[idx].canceledAt = new Date().toISOString();
           removed = c.directDebits[idx];

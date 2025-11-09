@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Bservice() {
+export default function PaymentService() {
   const [userCards, setUserCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -271,7 +271,6 @@ export default function Bservice() {
             )}
           </div>
 
-          {/* ---- Existing mandates list ---- */}
           <section className="mt-12">
             <h2 className="text-2xl font-bold text-[#003366] mb-4">Mine betalingsservices</h2>
 
