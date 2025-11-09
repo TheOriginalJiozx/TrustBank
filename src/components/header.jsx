@@ -30,7 +30,7 @@ function Header() {
   };
 
   const options = [
-    { label: 'Konti & indskud', value: '/accounts' },
+    { label: 'Betalingsservice', value: '/bservice' },
     { label: 'Betalinger & overførsler', value: '/transfer' },
     { label: 'Kort & forbrug', value: '/cardusage' },
     { label: 'Lån & kredit', value: '/loans' },
