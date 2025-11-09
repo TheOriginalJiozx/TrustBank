@@ -30,9 +30,9 @@ function Header() {
   };
 
   const options = [
-    { label: 'Betalingsservice', value: '/bservice' },
-    { label: 'Betalinger & overførsler', value: '/transfer' },
     { label: 'Kort & forbrug', value: '/cardusage' },
+    { label: 'Betal faktura', value: '/payment' },
+    { label: 'Betalingsservice', value: '/bservice' },
     { label: 'Lån & kredit', value: '/loans' },
   ];
 

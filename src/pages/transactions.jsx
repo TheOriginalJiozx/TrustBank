@@ -4,17 +4,24 @@ import Dropdown from 'react-dropdown';
 import DatePicker from 'react-multi-date-picker';
 
 export default function Transactions() {
-  const [transactions, setTransactions] = useState([]);
-  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Hent brugere/ kort fra localStorage
+  const storedUser = JSON.parse(localStorage.getItem('loggedInUser')) || [];
+  const cardOptions = storedUser.map(card => ({
+    label: `${card.cardNo} - ${card.username}`,
+    value: card.cardNo
+  }));
+
+  const [user, setUser] = useState(storedUser[0] || null);
+  const [transactions, setTransactions] = useState(user?.transactions || []);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categories, setCategories] = useState([]);
   const [selectedDate, setSelectedDate] = useState([]);
   const [isDropdownSelected, setIsDropdownSelected] = useState(false);
-
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   const monthParam = searchParams.get("month");
   const categoryParam = searchParams.get("category");
@@ -27,27 +34,19 @@ export default function Transactions() {
   ];
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('loggedInUser')) || [];
     if (!storedUser || storedUser.length === 0) {
       navigate('/login');
       return;
     }
 
-    if (!cardNo) {
-      alert("Ingen kort valgt.");
-      navigate("/cardusage");
-      return;
+    let initialCard = storedUser[0];
+    if (cardNo) {
+      const found = storedUser.find(c => c.cardNo === cardNo);
+      if (found) initialCard = found;
     }
 
-    const selectedCard = storedUser.find(c => c.cardNo === cardNo);
-    if (!selectedCard) {
-      alert("Dette kort tilhører ikke din bruger.");
-      navigate("/cardusage");
-      return;
-    }
-
-    setUser(selectedCard);
-    setTransactions(selectedCard.transactions || []);
+    setUser(initialCard);
+    setTransactions(initialCard.transactions || []);
 
     fetch("http://localhost:3001/api/getCategories")
       .then(res => res.json())
@@ -76,6 +75,17 @@ export default function Transactions() {
     </svg>
   );
 
+  const handleCardChange = option => {
+    const selected = storedUser.find(c => c.cardNo === option.value);
+    if (!selected) return;
+    setUser(selected);
+    setTransactions(selected.transactions || []);
+    setSelectedMonth(null);
+    setSelectedYear(null);
+    setSelectedCategory(null);
+    setSelectedDate([]);
+  };
+
   const handleMonthSelect = option => {
     if (!selectedYear) { alert("Vælg venligst et år først."); return; }
     setSelectedDate([]);
@@ -98,13 +108,12 @@ export default function Transactions() {
     setSelectedMonth(null);
     setSelectedYear(null);
     setSelectedCategory(null);
-
     setSelectedDate(option);
     setIsDropdownSelected(false);
   };
 
+  // Filter transaktioner
   let displayedTransactions = transactions;
-
   if (selectedDate?.length >= 1) {
     const start = selectedDate[0];
     const end = selectedDate.length === 2 ? selectedDate[1] : selectedDate[0];
@@ -136,12 +145,12 @@ export default function Transactions() {
     }
   }
 
-  const categoryNames = Object.keys(categories);
+  // Dropdown-options
   const monthOptions = months.map(m => ({ label: m, value: m }));
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 6 }, (_, i) => currentYear - i);
   const yearOptions = years.map(y => ({ label: y.toString(), value: y.toString() }));
-  const categoryOptions = categoryNames.map(c => ({ label: c, value: c }));
+  const categoryOptions = Object.keys(categories).map(c => ({ label: c, value: c }));
 
   return (
     <main className="p-6 max-w-2xl mx-auto">
@@ -149,15 +158,28 @@ export default function Transactions() {
         Transaktioner for kort {user?.cardNo}
       </h1>
 
+      <div className="mb-4 w-full max-w-md">
+        <label className="block mb-1 font-medium text-left">Skift kort</label>
+          <Dropdown
+            options={cardOptions}
+            onChange={handleCardChange}
+            value={user ? { label: `${user.cardNo} - ${user.username}`, value: user.cardNo } : null}
+            placeholder="Vælg kort"
+            controlClassName="py-2 px-4 rounded transition inline-flex items-center bg-[#003366] text-white hover:bg-[#002244] cursor-pointer min-h-[40px]"
+            menuClassName="absolute z-50 mt-1 bg-white text-black shadow-lg rounded min-w-[150px] max-h-64 overflow-y-auto"
+            arrowClosed={<Arrow />}
+            arrowOpen={<Arrow className="rotate-180" />}
+          />
+      </div>
+
       <div className={`flex gap-3 mb-4 items-center flex-wrap ${isDropdownSelected ? "flex-nowrap min-w-max" : ""}`}>
         <div className="flex gap-3 items-center relative">
+
           <Dropdown
             options={monthOptions}
             onChange={handleMonthSelect}
             value={selectedMonth}
             placeholder="Måned"
-            onFocus={() => setIsDropdownSelected("month")}
-            onBlur={() => setIsDropdownSelected(null)}
             disabled={!selectedYear}
             controlClassName={`py-2 px-4 rounded transition inline-flex items-center ${
               selectedYear ? "bg-[#003366] text-white hover:bg-[#002244] cursor-pointer" : "bg-gray-400 text-gray-200 cursor-not-allowed"
@@ -172,8 +194,6 @@ export default function Transactions() {
             onChange={handleYearSelect}
             value={selectedYear}
             placeholder="År"
-            onFocus={() => setIsDropdownSelected("year")}
-            onBlur={() => setIsDropdownSelected(null)}
             controlClassName="py-2 px-4 rounded transition inline-flex items-center bg-[#003366] text-white hover:bg-[#002244] cursor-pointer min-h-[40px]"
             menuClassName="absolute z-50 mt-1 bg-white text-black shadow-lg rounded min-w-[150px] max-h-64 overflow-y-auto"
             arrowClosed={<Arrow />}
@@ -185,8 +205,6 @@ export default function Transactions() {
             onChange={handleCategorySelect}
             value={selectedCategory || null}
             placeholder="Kategori"
-            onFocus={() => setIsDropdownSelected("category")}
-            onBlur={() => setIsDropdownSelected(null)}
             controlClassName="py-2 px-4 rounded transition inline-flex items-center bg-[#003366] text-white hover:bg-[#002244] cursor-pointer min-h-[40px]"
             menuClassName="absolute z-50 mt-1 bg-white text-black shadow-lg rounded min-w-[150px] max-h-64 overflow-y-auto"
             arrowClosed={<Arrow />}
@@ -216,30 +234,30 @@ export default function Transactions() {
 
       {displayedTransactions.length > 0 ? (
         <ul className="space-y-3">
-        {displayedTransactions.map((t, i) => (
-          <li key={i} className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white">
-            {t.type === "sent" && (
-              <>
-                <p><strong>FIK nummer:</strong> {t.fikNo}</p>
-                <p><strong>Reference og kreditor nummer:</strong> {t.receiverReferenceNo} / {t.receiverCreditorNo}</p>
-                <p><strong>Modtager:</strong> {t.company || "Ukendt"}</p>
-                <p><strong>Kategori:</strong> {t.category || "Ukendt kategori"}</p>
-              </>
-            )}
+          {displayedTransactions.map((t, i) => (
+            <li key={i} className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white">
+              {t.type === "sent" && (
+                <>
+                  <p><strong>FIK nummer:</strong> {t.fikNo}</p>
+                  <p><strong>Reference og kreditor nummer:</strong> {t.receiverReferenceNo} / {t.receiverCreditorNo}</p>
+                  <p><strong>Modtager:</strong> {t.company || "Ukendt"}</p>
+                  <p><strong>Kategori:</strong> {t.category || "Ukendt kategori"}</p>
+                </>
+              )}
 
-            {t.type === "received" && (
-              <>
-                <p><strong>Afsender:</strong> {t.username || user?.username || "Ukendt"}</p>
-                <p><strong>Kategori:</strong> {t.category || "Ukendt kategori"}</p>
-              </>
-            )}
+              {t.type === "received" && (
+                <>
+                  <p><strong>Afsender:</strong> {t.username || user?.username || "Ukendt"}</p>
+                  <p><strong>Kategori:</strong> {t.category || "Ukendt kategori"}</p>
+                </>
+              )}
 
-            <p><strong>Beløb:</strong> {t.amount} kr.</p>
-            <p><strong>Status:</strong> {t.type}</p>
-            <p><strong>Dato:</strong> {t.timestamp ? new Date(t.timestamp).toLocaleString("da-DK") : "Ukendt"}</p>
-          </li>
-        ))}
-      </ul>
+              <p><strong>Beløb:</strong> {t.amount} kr.</p>
+              <p><strong>Status:</strong> {t.type}</p>
+              <p><strong>Dato:</strong> {t.timestamp ? new Date(t.timestamp).toLocaleString("da-DK") : "Ukendt"}</p>
+            </li>
+          ))}
+        </ul>
       ) : (
         <p className="text-gray-600 text-center">Ingen transaktioner for dette kort.</p>
       )}

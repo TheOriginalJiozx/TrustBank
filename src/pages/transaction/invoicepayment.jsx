@@ -16,6 +16,7 @@ export default function Post() {
   const [responseData, setResponseData] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState({ referenceNo: "", creditorNo: "" });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,8 +50,30 @@ export default function Post() {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
+  const handlePayment = () => {
+    let hasErrors = false;
+    const newErrors = { referenceNo: "", creditorNo: "" };
+
+    if (!formData.referenceNo || formData.referenceNo.length !== 15) {
+      newErrors.referenceNo = "Reference nummer skal være 15 cifre";
+      hasErrors = true;
+    }
+
+    if (!formData.creditorNo || formData.creditorNo.length !== 8) {
+      newErrors.creditorNo = "Kreditor nummer skal være 8 cifre";
+      hasErrors = true;
+    }
+
+    setErrors(newErrors);
+
+    if (!hasErrors) {
+      setShowConfirmModal(true);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!selectedCard) return alert("Vælg et kort først!");
 
     let updatedFormData = { ...formData };
@@ -157,6 +180,26 @@ export default function Post() {
           Betal med kort: {selectedCard.cardNo}
         </h1>
 
+      <div className="mb-4 w-full max-w-md">
+        <label className="block mb-1 font-medium text-left">Skift kort</label>
+        <Dropdown
+          options={userCards.map(card => ({
+            value: card.cardNo,
+            label: `${card.cardNo} (Reg.nr.: ${card.regNo} - Kontonr.: ${card.accNo})`,
+          }))}
+          onChange={(e) => {
+            const card = userCards.find(c => c.cardNo === e.value);
+            setSelectedCard(card);
+          }}
+          value={selectedCard ? selectedCard.cardNo : ""}
+          placeholder="Vælg kort"
+          className="w-full"
+          controlClassName="w-full border border-gray-300 px-4 py-2 bg-white text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-none"
+          menuClassName="mt-1 border border-gray-300 shadow-lg overflow-hidden z-10 bg-white menu-no-radius"
+          optionClassName="px-4 py-2 text-gray-800 hover:bg-gray-100 cursor-pointer rounded-none"
+        />
+      </div>
+
         <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto">
           <fieldset className="flex flex-col gap-4">
             <Dropdown
@@ -175,16 +218,17 @@ export default function Post() {
                 Modtagers reference nummer
               </label>
               <input
-                type="number"
+                type="text"
                 id="referenceNo"
                 value={formData.referenceNo}
                 onChange={handleChange}
                 placeholder="Reference nummer"
-                onKeyDown={(e) => {
-                  if (e.key === "ArrowUp" || e.key === "ArrowDown") e.preventDefault();
-                }}
-                className="border border-gray-300 rounded px-3 py-2 appearance-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                maxLength={15}
+                className="border border-gray-300 rounded px-3 py-2"
               />
+              {errors.referenceNo && (
+                <p className="text-red-600 text-sm mt-1">{errors.referenceNo}</p>
+              )}
             </div>
 
             <div className="flex flex-col text-left">
@@ -192,16 +236,17 @@ export default function Post() {
                 Modtagers kreditor nummer
               </label>
               <input
-                type="number"
+                type="text"
                 id="creditorNo"
                 value={formData.creditorNo}
                 onChange={handleChange}
                 placeholder="Kreditor nummer"
-                onKeyDown={(e) => {
-                  if (e.key === "ArrowUp" || e.key === "ArrowDown") e.preventDefault();
-                }}
-                className="border border-gray-300 rounded px-3 py-2 appearance-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                maxLength={8}
+                className="border border-gray-300 rounded px-3 py-2"
               />
+              {errors.creditorNo && (
+                <p className="text-red-600 text-sm mt-1">{errors.creditorNo}</p>
+              )}
             </div>
 
             <div className="flex flex-col text-left">
@@ -238,8 +283,7 @@ export default function Post() {
 
             <button
               type="button"
-              disabled={!formData.fikNo}
-              onClick={() => setShowConfirmModal(true)}
+              onClick={handlePayment}
               className={`py-2 px-4 rounded transition ${
                 formData.fikNo
                   ? "bg-[#003366] text-white hover:bg-[#002244]"
