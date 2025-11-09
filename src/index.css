@@ -27,3 +27,20 @@ code {
 .Dropdown-option.is-selected {
   @apply bg-gray-200;
 }
+
+.menu-no-radius,
+.menu-no-radius * {
+  border-radius: 0 !important;
+}
+
+.menu-no-radius .react-dropdown__option--selected,
+.menu-no-radius .react-dropdown__option:focus,
+.menu-no-radius .react-dropdown__option:active,
+.menu-no-radius .dropdown-item.selected,
+.menu-no-radius .dropdown-item:focus {
+  border-radius: 0 !important;
+}
+
+.menu-no-radius [aria-selected="true"] {
+  border-radius: 0 !important;
+}

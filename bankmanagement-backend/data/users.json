@@ -8,23 +8,26 @@
       "cvv": "714",
       "transactions": [
         {
-          "company": "Kunde",
-          "category": "Kunde",
-          "receiverRegNo": "8439",
-          "receiverAccNo": "7829223060",
-          "amount": "1",
-          "comment": "11",
-          "timestamp": "2025-11-07T19:39:30.777Z",
+          "company": "TUI",
+          "category": "Rejser & Ferie",
+          "receiverCreditorNo": "49281736",
+          "receiverReferenceNo": "203984751628493",
+          "fikNo": "+71",
+          "amount": "11",
+          "comment": "test",
+          "timestamp": "2025-11-09T16:57:14.644Z",
           "type": "sent"
         },
         {
-          "company": "Kunde",
-          "category": "Kunde",
-          "sender": "TheOriginalJiozx",
+          "company": "TUI",
+          "category": "Rejser & Ferie",
+          "receiverCreditorNo": "49281736",
+          "receiverReferenceNo": "203984751628493",
+          "fikNo": "+71",
           "amount": "11",
           "comment": "Test",
-          "timestamp": "2025-11-08T14:45:58.320Z",
-          "type": "received"
+          "timestamp": "2025-11-09T17:19:08.498Z",
+          "type": "sent"
         }
       ]
     },
@@ -36,13 +39,15 @@
       "cvv": "749",
       "transactions": [
         {
-          "company": "Netto",
-          "category": "Mad & Drikke",
-          "receiverRegNo": "3348",
-          "receiverAccNo": "71920483",
-          "amount": "1",
-          "comment": "Netto",
-          "timestamp": "2025-11-07T18:12:25.790Z"
+          "company": "TUI",
+          "category": "Rejser & Ferie",
+          "receiverCreditorNo": "49281736",
+          "receiverReferenceNo": "203984751628493",
+          "fikNo": "+71",
+          "amount": "111",
+          "comment": "Testing",
+          "timestamp": "2025-11-09T17:15:25.440Z",
+          "type": "sent"
         }
       ]
     }

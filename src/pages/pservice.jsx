@@ -38,7 +38,7 @@ export default function PaymentService() {
   };
 
   const resetForm = () =>
-    setForm({ company: "", amountMonthly: "", dayOfMonth: "", endDate: "", note: "" });
+    setForm({ company: "", amountMonthly: "", dayOfMonth: "", note: "" });
 
 
   useEffect(() => {
@@ -82,7 +82,6 @@ export default function PaymentService() {
       company: form.company.trim(),
       amountMonthly: Number(form.amountMonthly),
       dayOfMonth: Number(form.dayOfMonth),
-      endDate: form.endDate || null,
       note: form.note?.trim() || "",
     };
 
@@ -228,17 +227,6 @@ export default function PaymentService() {
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">1-31</p>
-              </div>
-
-              <div>
-                <label htmlFor="endDate" className="block mb-1 font-medium">Slutdato (valgfri)</label>
-                <input
-                  id="endDate"
-                  type="date"
-                  value={form.endDate}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2"
-                />
               </div>
 
               <div>

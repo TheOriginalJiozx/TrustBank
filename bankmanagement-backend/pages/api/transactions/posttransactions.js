@@ -1,11 +1,8 @@
 import fs from "fs";
 import path from "path";
 import NextCors from "nextjs-cors";
-import { useNavigate } from "react-router-dom";
 
 const filePath = path.join(process.cwd(), "data", "users.json");
-const [loading, setLoading] = useState(true);
-const navigate = useNavigate();
 
 export default async function handler(req, res) {
   await NextCors(req, res, {
@@ -14,26 +11,17 @@ export default async function handler(req, res) {
     optionsSuccessStatus: 200,
   });
 
-  useEffect(() => {
-    const raw = localStorage.getItem("loggedInUser");
-    if (!raw) {
-      navigate('/login', { replace: true });
-      setLoading(false);
-      return;
-    }
-  }, []);
-
   if (req.method === "OPTIONS") return res.status(200).end();
 
   if (req.method === "POST") {
     const {
       company,
       category,
-      senderUsername,
       senderRegNo,
       senderAccNo,
-      receiverRegNo,
-      receiverAccNo,
+      receiverCreditorNo,
+      receiverReferenceNo,
+      fikNo,
       amount,
       comment,
     } = req.body;
@@ -48,7 +36,6 @@ export default async function handler(req, res) {
     }
 
     let sentTransaction = null;
-    let receivedTransaction = null;
 
     for (const username in users) {
       users[username].forEach((card) => {
@@ -60,8 +47,9 @@ export default async function handler(req, res) {
           const newTransaction = {
             company: company || "Ukendt virksomhed",
             category: category || "Ukendt kategori",
-            receiverRegNo: String(receiverRegNo).trim(),
-            receiverAccNo: String(receiverAccNo).trim(),
+            receiverCreditorNo: String(receiverCreditorNo).trim(),
+            receiverReferenceNo: String(receiverReferenceNo).trim(),
+            fikNo,
             amount,
             comment,
             timestamp: new Date().toISOString(),
@@ -69,24 +57,6 @@ export default async function handler(req, res) {
           };
           card.transactions.push(newTransaction);
           sentTransaction = newTransaction;
-        }
-
-        if (
-          String(card.regNo) === String(receiverRegNo).trim() &&
-          String(card.accNo) === String(receiverAccNo).trim()
-        ) {
-          card.transactions = card.transactions || [];
-          const received = {
-            company: company || "Ukendt virksomhed",
-            category: category || "Ukendt kategori",
-            sender: senderUsername,
-            amount,
-            comment,
-            timestamp: new Date().toISOString(),
-            type: "received",
-          };
-          card.transactions.push(received);
-          receivedTransaction = received;
         }
       });
     }
@@ -101,8 +71,8 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Kunne ikke gemme data" });
     }
 
-    return res.status(200).json({ sent: sentTransaction, received: receivedTransaction });
+    return res.status(200).json({ sent: sentTransaction });
   }
 
-  res.status(405).json({ error: "Method not allowed" });
+  res.status(405).json({ error: "Metode ikke tilladt" });
 }

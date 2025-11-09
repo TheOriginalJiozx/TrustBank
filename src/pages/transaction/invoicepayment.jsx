@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Dropdown from 'react-dropdown';
 
 export default function Post() {
   const [userCards, setUserCards] = useState([]);
@@ -13,6 +14,7 @@ export default function Post() {
     category: "",
   });
   const [responseData, setResponseData] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -55,7 +57,7 @@ export default function Post() {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/api/findCompany?regNo=${formData.regNo}&accNo=${formData.accNo}&comment=${encodeURIComponent(formData.comment)}`
+        `http://localhost:3001/api/findCompany?creditorNo=${formData.creditorNo}&referenceNo=${formData.referenceNo}&fikNo=${formData.fikNo}&comment=${encodeURIComponent(formData.comment)}`
       );
       if (res.ok) {
         const company = await res.json();
@@ -82,10 +84,11 @@ export default function Post() {
             senderUsername: selectedCard.username,
             senderRegNo: selectedCard.regNo,
             senderAccNo: selectedCard.accNo,
-            receiverRegNo: formData.regNo,
-            receiverAccNo: formData.accNo,
+            receiverCreditorNo: formData.creditorNo,
+            receiverReferenceNo: formData.referenceNo,
             amount: formData.amount,
             comment: formData.comment,
+            fikNo: formData.fikNo,
           }),
         }
       );
@@ -99,6 +102,8 @@ export default function Post() {
   };
 
   if (loading) return <p className="p-6 text-center">Indlæser kort...</p>;
+
+  const options = ["", "+71"];
 
   if (!selectedCard) {
     return (
@@ -154,31 +159,48 @@ export default function Post() {
 
         <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto">
           <fieldset className="flex flex-col gap-4">
+            <Dropdown
+              options={options}
+              onChange={(e) => setFormData({ ...formData, fikNo: e.value })}
+              value={formData.fikNo}
+              placeholder="Vælg FIK-nummer"
+              className="w-full"
+              controlClassName="w-full border border-gray-300 px-4 py-2 bg-white text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-none"
+              menuClassName="mt-1 border border-gray-300 shadow-lg overflow-hidden z-10 bg-white menu-no-radius"
+              optionClassName="px-4 py-2 text-gray-800 hover:bg-gray-100 cursor-pointer rounded-none"
+            />
+
             <div className="flex flex-col text-left">
-              <label htmlFor="accNo" className="mb-1 font-medium">
-                Modtagers kontonummer
+              <label htmlFor="referenceNo" className="mb-1 font-medium">
+                Modtagers reference nummer
               </label>
               <input
                 type="number"
-                id="accNo"
-                value={formData.accNo}
+                id="referenceNo"
+                value={formData.referenceNo}
                 onChange={handleChange}
-                placeholder="Kontonummer"
-                className="border border-gray-300 rounded px-3 py-2"
+                placeholder="Reference nummer"
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowUp" || e.key === "ArrowDown") e.preventDefault();
+                }}
+                className="border border-gray-300 rounded px-3 py-2 appearance-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>
 
             <div className="flex flex-col text-left">
-              <label htmlFor="regNo" className="mb-1 font-medium">
-                Modtagers registeringsnummer
+              <label htmlFor="creditorNo" className="mb-1 font-medium">
+                Modtagers kreditor nummer
               </label>
               <input
                 type="number"
-                id="regNo"
-                value={formData.regNo}
+                id="creditorNo"
+                value={formData.creditorNo}
                 onChange={handleChange}
-                placeholder="Registreringsnummer"
-                className="border border-gray-300 rounded px-3 py-2"
+                placeholder="Kreditor nummer"
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowUp" || e.key === "ArrowDown") e.preventDefault();
+                }}
+                className="border border-gray-300 rounded px-3 py-2 appearance-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>
 
@@ -193,7 +215,10 @@ export default function Post() {
                 value={formData.amount}
                 onChange={handleChange}
                 placeholder="Indtast beløb"
-                className="border border-gray-300 rounded px-3 py-2"
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowUp" || e.key === "ArrowDown") e.preventDefault();
+                }}
+                className="border border-gray-300 rounded px-3 py-2 appearance-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>
 
@@ -212,12 +237,44 @@ export default function Post() {
             </div>
 
             <button
-              type="submit"
-              className="bg-[#003366] text-white py-2 px-4 rounded hover:bg-[#002244] transition"
+              type="button"
+              disabled={!formData.fikNo}
+              onClick={() => setShowConfirmModal(true)}
+              className={`py-2 px-4 rounded transition ${
+                formData.fikNo
+                  ? "bg-[#003366] text-white hover:bg-[#002244]"
+                  : "bg-gray-400 text-gray-200 cursor-not-allowed"
+              }`}
             >
-              Overfør
+              Betal faktura
             </button>
           </fieldset>
+
+          {showConfirmModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 text-center">
+                <h2 className="text-xl font-bold mb-4">Bekræft overførsel</h2>
+                <p className="mb-6">Har du husket at dobbelttjekke dine indtastninger?</p>
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => {
+                      setShowConfirmModal(false);
+                      handleSubmit(new Event("submit")); // fortsæt med overførsel
+                    }}
+                    className="bg-[#003366] text-white px-4 py-2 rounded hover:bg-[#002244] transition"
+                  >
+                    Ja, fortsæt
+                  </button>
+                  <button
+                    onClick={() => setShowConfirmModal(false)}
+                    className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition"
+                  >
+                    Annuller
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </form>
 
         {responseData && (
@@ -229,6 +286,7 @@ export default function Post() {
           </div>
         )}
       </main>
+      <br />
     </div>
   );
 }

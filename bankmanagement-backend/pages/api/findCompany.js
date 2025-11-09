@@ -12,20 +12,21 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Metode ikke tilladt" });
   }
 
-  const { regNo, accNo, comment } = req.method === "POST" ? req.body : req.query;
+  const { creditorNo, referenceNo, fikNo, comment } = req.method === "POST" ? req.body : req.query;
 
-  if (!regNo || !accNo) {
-    return res.status(400).json({ error: "regNo og accNo skal angives" });
+  if (!creditorNo || !referenceNo || !fikNo) {
+    return res.status(400).json({ error: "creditorNo, referenceNo og fikNo skal angives" });
   }
 
   try {
-    const company = findCompanyByAccount(String(regNo), String(accNo), comment || "");
+    const company = findCompanyByAccount(String(creditorNo), String(referenceNo), String(fikNo), comment || "");
 
     return res.status(200).json({
       name: company.name,
       category: company.category,
-      regNo: company.regNo,
-      accNo: company.accNo,
+      creditorNo: company.creditorNo,
+      referenceNo: company.referenceNo,
+      fikNo: company.fikNo,
       comment: company.comment || comment || ""
     });
   } catch (err) {
@@ -33,8 +34,9 @@ export default async function handler(req, res) {
     return res.status(500).json({
       name: comment || "Ukendt firma",
       category: "Ukendt kategori",
-      regNo,
-      accNo,
+      creditorNo,
+      referenceNo,
+      fikNo,
       comment: comment || ""
     });
   }

@@ -6,7 +6,7 @@ import Footer from "./components/footer";
 import Login from "./pages/login";
 import Me from "./pages/me";
 import Account from "./pages/account";
-import Transfer from "./pages/transaction/transfer";
+import InvoicePayment from "./pages/transaction/invoicepayment";
 import Transactions from './pages/transactions';
 import PaymentService from "./pages/pservice";
 import Cardusage from "./pages/cardusage";
@@ -28,7 +28,7 @@ function App() {
                     <Route path="/" element={<Index />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/me" element={<Me />} />
-                    <Route path="/transfer" element={<Transfer />} />
+                    <Route path="/payment" element={<InvoicePayment />} />
                     <Route path="/transactions" element={<Transactions />} />
                     <Route path="/account" element={<Account />} />
                     <Route path="/pbs" element={<PaymentService />} />
