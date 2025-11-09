@@ -8,7 +8,7 @@ import Me from "./pages/me";
 import Account from "./pages/account";
 import Transfer from "./pages/transaction/transfer";
 import Transactions from './pages/transactions';
-import Accounts from "./pages/accounts";
+import Bservice from "./pages/bservice";
 import Cardusage from "./pages/cardusage";
 
 function App() {
@@ -31,7 +31,7 @@ function App() {
                     <Route path="/transfer" element={<Transfer />} />
                     <Route path="/transactions" element={<Transactions />} />
                     <Route path="/account" element={<Account />} />
-                    <Route path="/accounts" element={<Accounts />} />
+                    <Route path="/bservice" element={<Bservice />} />
                     <Route path="/cardusage" element={<Cardusage />} />
                 </Routes>
             </main>
