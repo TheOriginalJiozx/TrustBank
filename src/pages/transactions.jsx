@@ -218,20 +218,24 @@ export default function Transactions() {
         <ul className="space-y-3">
         {displayedTransactions.map((t, i) => (
           <li key={i} className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white">
-            {t.type !== "received" && (
-              <p><strong>Reg og konto:</strong> {t.receiverRegNo} / {t.receiverAccNo}</p>
+            {t.type === "sent" && (
+              <>
+                <p><strong>FIK nummer:</strong> {t.fikNo}</p>
+                <p><strong>Reference og kreditor nummer:</strong> {t.receiverReferenceNo} / {t.receiverCreditorNo}</p>
+                <p><strong>Modtager:</strong> {t.company || "Ukendt"}</p>
+                <p><strong>Kategori:</strong> {t.category || "Ukendt kategori"}</p>
+              </>
             )}
+
+            {t.type === "received" && (
+              <>
+                <p><strong>Afsender:</strong> {t.username || user?.username || "Ukendt"}</p>
+                <p><strong>Kategori:</strong> {t.category || "Ukendt kategori"}</p>
+              </>
+            )}
+
             <p><strong>Beløb:</strong> {t.amount} kr.</p>
-            {t.type !== "received" && (
-              <p><strong>Modtager:</strong> {t.company || t.customer || "Ukendt"}</p>
-            )}
-            {t.type !== "received" && (
-              <p><strong>Kategori:</strong> {t.category || "Ukendt kategori"}</p>
-            )}
             <p><strong>Status:</strong> {t.type}</p>
-            {t.type !== "sent" && (
-              <p><strong>Afsender:</strong> {t.sender} </p>
-            )}
             <p><strong>Dato:</strong> {t.timestamp ? new Date(t.timestamp).toLocaleString("da-DK") : "Ukendt"}</p>
           </li>
         ))}

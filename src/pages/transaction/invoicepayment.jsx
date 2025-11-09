@@ -96,8 +96,8 @@ export default function Post() {
       const data = await res.json();
       setResponseData(data);
     } catch (error) {
-      console.error("Fejl ved overførsel:", error);
-      setResponseData({ error: "Noget gik galt med overførslen." });
+      console.error("Fejl ved betaling:", error);
+      setResponseData({ error: "Noget gik galt med betalingen." });
     }
   };
 
@@ -154,7 +154,7 @@ export default function Post() {
     <div className="min-h-screen flex flex-col bg-[#f8f9fb] text-slate-800 font-sans">
       <main className="flex flex-col flex-1 items-center text-center px-6 pt-28 bg-gradient-to-br from-[#eaf4ff] via-[#f8f9fb] to-[#ffffff] relative overflow-hidden">
         <h1 className="text-5xl md:text-6xl font-extrabold mb-4 tracking-tight text-[#003366]">
-          Overfør fra kort: {selectedCard.cardNo}
+          Betal med kort: {selectedCard.cardNo}
         </h1>
 
         <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto">
@@ -206,7 +206,7 @@ export default function Post() {
 
             <div className="flex flex-col text-left">
               <label htmlFor="amount" className="mb-1 font-medium">
-                Overførselsbeløb
+                Skyldte beløb
               </label>
               <input
                 type="number"
@@ -253,7 +253,7 @@ export default function Post() {
           {showConfirmModal && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 text-left">
-                <h2 className="text-xl font-bold mb-4 text-center">Bekræft overførsel</h2>
+                <h2 className="text-xl font-bold mb-4 text-center">Bekræft betaling</h2>
                 <p className="mb-4">Har du husket at dobbelttjekke dine indtastninger?</p>
 
                 <div className="mb-6 space-y-2">
@@ -268,7 +268,7 @@ export default function Post() {
                   <button
                     onClick={() => {
                       setShowConfirmModal(false);
-                      handleSubmit(new Event("submit")); // fortsæt med overførsel
+                      handleSubmit(new Event("submit"));
                     }}
                     className="bg-[#003366] text-white px-4 py-2 rounded hover:bg-[#002244] transition"
                   >
