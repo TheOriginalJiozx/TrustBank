@@ -42,14 +42,6 @@ export default function Cardusage() {
     );
   }
 
-  if (userCards.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-600">
-        <p>Ingen kort fundet for din bruger.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-[#f8f9fb] text-slate-800">
       <section className="px-6 pt-28 pb-12 bg-gradient-to-br from-[#eaf4ff] via-[#f8f9fb] to-white">

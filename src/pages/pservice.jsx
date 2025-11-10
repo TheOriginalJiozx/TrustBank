@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Dropdown from 'react-dropdown';
 
 export default function PaymentService() {
   const [userCards, setUserCards] = useState([]);
@@ -185,6 +186,28 @@ export default function PaymentService() {
             <p className="text-[#4a4a4a] mb-8">
               Kort: <span className="font-semibold">{selectedCard.cardNo}</span> — Reg {selectedCard.regNo}, Konto {selectedCard.accNo}
             </p>
+
+            <div className="mb-6">
+              <label className="block mb-1 font-medium text-left">Skift kort</label>
+              <Dropdown
+                options={userCards.map((card) => ({
+                  value: card.cardNo,
+                  label: `${card.cardNo} (Reg.nr.: ${card.regNo} - Kontonr.: ${card.accNo})`,
+                }))}
+                onChange={(e) => {
+                  const card = userCards.find((c) => c.cardNo === e.value);
+                  if (card) {
+                    setSelectedCard(card);
+                  }
+                }}
+                value={selectedCard ? selectedCard.cardNo : ""}
+                placeholder="Vælg kort"
+                className="w-full"
+                controlClassName="w-full border border-gray-300 px-4 py-2 bg-white text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-none"
+                menuClassName="mt-1 border border-gray-300 shadow-lg overflow-hidden z-10 bg-white menu-no-radius"
+                optionClassName="px-4 py-2 text-gray-800 hover:bg-gray-100 cursor-pointer rounded-none"
+              />
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>

@@ -32,7 +32,7 @@ function Header() {
   const options = [
     { label: 'Kort & forbrug', value: '/cardusage' },
     { label: 'Betal faktura', value: '/payment' },
-    { label: 'Betalingsservice', value: '/bservice' },
+    { label: 'Betalingsservice', value: '/pbs' },
     { label: 'Lån & kredit', value: '/loans' },
   ];
 
