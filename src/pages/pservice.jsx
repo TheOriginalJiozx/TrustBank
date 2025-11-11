@@ -5,15 +5,20 @@ import Dropdown from 'react-dropdown';
 export default function PaymentService() {
   const [userCards, setUserCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [errors, setErrors] = useState({ referenceNo: "", creditorNo: "" });
   const [loading, setLoading] = useState(true);
 
-  const [form, setForm] = useState({
+  const [form, formData] = useState({
     company: "",
+    pbsNo: "",
+    debGrNr: "",
+    customerNo: "",
     amountMonthly: "",
     dayOfMonth: "",
-    endDate: "",
     note: "",
   });
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const [serverResponse, setServerResponse] = useState(null);
   const [mandates, setMandates] = useState([]);
@@ -22,13 +27,12 @@ export default function PaymentService() {
 
   const navigate = useNavigate();
 
-
   const apiBase = "http://localhost:3001/api";
 
-  const loadMandates = async (regNo, accNo) => {
+  const loadMandates = async (accNo, regNo) => {
     setLoadingMandates(true);
     try {
-      const res = await fetch(`${apiBase}/directdebits?regNo=${regNo}&accNo=${accNo}`);
+      const res = await fetch(`${apiBase}/directdebits?accNo=${accNo}&regNo=${regNo}`);
       const data = await res.json();
       setMandates(Array.isArray(data) ? data : []);
     } catch {
@@ -38,9 +42,8 @@ export default function PaymentService() {
     }
   };
 
-  const resetForm = () =>
-    setForm({ company: "", amountMonthly: "", dayOfMonth: "", note: "" });
-
+  const reformData = () =>
+    formData({ company: "", pbsNo: "", debGrNr: "", customerNo: "", amountMonthly: "", dayOfMonth: "", note: "" });
 
   useEffect(() => {
     const raw = localStorage.getItem("loggedInUser");
@@ -63,13 +66,39 @@ export default function PaymentService() {
 
   useEffect(() => {
     if (!selectedCard) return;
-    loadMandates(selectedCard.regNo, selectedCard.accNo);
+    loadMandates(selectedCard.accNo, selectedCard.regNo);
   }, [selectedCard]);
 
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setForm((p) => ({ ...p, [id]: value }));
+    formData((p) => ({ ...p, [id]: value }));
+  };
+
+  const handlePBS = () => {
+    let hasErrors = false;
+    const newErrors = { pbsNo: "", debGrNr: "", customerNo: "" };
+
+    if (!form.pbsNo || form.pbsNo.length !== 8) {
+      newErrors.pbsNo = "PBS-nummer skal være 8 cifre";
+      hasErrors = true;
+    }
+
+    if (!form.debGrNr || form.debGrNr.length < 5) {
+      newErrors.debGrNr = "Debitor kredit nummer skal min være 5 cifre";
+      hasErrors = true;
+    }
+
+    if (!form.customerNo || form.customerNo.length !== 9) {
+      newErrors.customerNo = "Kundenummer skal være 9 cifre";
+      hasErrors = true;
+    }
+
+    setErrors(newErrors);
+
+    if (!hasErrors) {
+      setShowConfirmModal(true);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -80,7 +109,9 @@ export default function PaymentService() {
       username: selectedCard.username,
       regNo: selectedCard.regNo,
       accNo: selectedCard.accNo,
-      company: form.company.trim(),
+      pbsNo: String(form.pbsNo),
+      debGrNr: String(form.debGrNr),
+      customerNo: String(form.customerNo),
       amountMonthly: Number(form.amountMonthly),
       dayOfMonth: Number(form.dayOfMonth),
       note: form.note?.trim() || "",
@@ -97,8 +128,8 @@ export default function PaymentService() {
       setServerResponse(res.ok ? data : { error: data?.error || "Kunne ikke oprette betalingsservice." });
 
       if (res.ok) {
-        resetForm();
-        await loadMandates(selectedCard.regNo, selectedCard.accNo);
+        reformData();
+        await loadMandates(selectedCard.accNo, selectedCard.regNo);
       }
     } catch {
       setServerResponse({ error: "Server utilgængelig eller netværksfejl." });
@@ -118,7 +149,7 @@ export default function PaymentService() {
         { method: "DELETE" }
       );
 
-      await loadMandates(selectedCard.regNo, selectedCard.accNo);
+      await loadMandates(selectedCard.accNo, selectedCard.regNo);
     } finally {
       setActionBusy(false);
     }
@@ -211,23 +242,61 @@ export default function PaymentService() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="company" className="block mb-1 font-medium">Virksomhed</label>
+                <label htmlFor="pbsNo" className="block mb-1 font-medium">PBS-nummer</label>
                 <input
-                  id="company"
+                  id="pbsNo"
                   type="text"
-                  value={form.company}
+                  value={form.pbsNo}
                   onChange={handleChange}
-                  placeholder="Fx. YouSee"
+                  maxLength={8}
+                  placeholder="Fx 150"
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   required
                 />
+                {errors.pbsNo && (
+                  <p className="text-red-600 text-sm mt-1">{errors.pbsNo}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="debGrNr" className="block mb-1 font-medium">Debitor gruppe nummer</label>
+                <input
+                  id="debGrNr"
+                  type="text"
+                  value={form.debGrNr}
+                  onChange={handleChange}
+                  minLength={5}
+                  placeholder="Fx 150"
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  required
+                />
+                {errors.debGrNr && (
+                  <p className="text-red-600 text-sm mt-1">{errors.debGrNr}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="customerNo" className="block mb-1 font-medium">Kundenummer</label>
+                <input
+                  id="customerNo"
+                  type="text"
+                  value={form.customerNo}
+                  onChange={handleChange}
+                  maxLength={9}
+                  placeholder="Fx 150"
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  required
+                />
+                {errors.customerNo && (
+                  <p className="text-red-600 text-sm mt-1">{errors.customerNo}</p>
+                )}
               </div>
 
               <div>
                 <label htmlFor="amountMonthly" className="block mb-1 font-medium">Beløb</label>
                 <input
                   id="amountMonthly"
-                  type="number"
+                  type="text"
                   step=".01"
                   value={form.amountMonthly}
                   onChange={handleChange}
@@ -264,13 +333,49 @@ export default function PaymentService() {
               </div>
 
               <button
-                type="submit"
-                disabled={actionBusy}
-                className="bg-[#003366] text-white py-2 px-4 rounded hover:bg-[#002244] transition disabled:opacity-60"
+                type="button"
+                onClick={handlePBS}
+                className={`bg-[#003366] text-white py-2 px-4 rounded hover:bg-[#002244] transition disabled:opacity-60 transition
+                  }`}
               >
                 {actionBusy ? "Opretter..." : "Opret betalingsservice"}
               </button>
             </form>
+
+            {showConfirmModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 text-left">
+                  <h2 className="text-xl font-bold mb-4 text-center">Bekræft PBS aftale</h2>
+                  <p className="mb-4">Har du husket at dobbelttjekke dine indtastninger?</p>
+
+                  <div className="mb-6 space-y-2">
+                    <p><span className="font-semibold">PBS-nummer:</span> {form.pbsNo}</p>
+                    <p><span className="font-semibold">Debitor gruppe nummer:</span> {form.debGrNr}</p>
+                    <p><span className="font-semibold">Kundenummer:</span> {form.customerNo}</p>
+                    <p><span className="font-semibold">Månedligt beløb:</span> {form.amountMonthly}</p>
+                    <p><span className="font-semibold">Kommentar:</span> {form.note || "-"}</p>
+                  </div>
+
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => {
+                        setShowConfirmModal(false);
+                        handleSubmit(new Event("submit"));
+                      }}
+                      className="bg-[#003366] text-white px-4 py-2 rounded hover:bg-[#002244] transition"
+                    >
+                      Ja, fortsæt
+                    </button>
+                    <button
+                      onClick={() => setShowConfirmModal(false)}
+                      className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition"
+                    >
+                      Annuller
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {serverResponse && (
               <div className="mt-8 bg-white p-4 rounded shadow">
@@ -301,7 +406,9 @@ export default function PaymentService() {
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg font-semibold">{m.company}</span>
+                          <span className="text-lg font-semibold">
+                            {typeof m.company === "object" ? m.company.name : m.company || "Ukendt virksomhed"}
+                          </span>
                           <span
                             className={`text-xs px-2 py-0.5 rounded-full ${
                               m.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
@@ -310,11 +417,14 @@ export default function PaymentService() {
                             {m.active ? "Aktiv" : "Annulleret"}
                           </span>
                         </div>
-                        <div className="text-sm text-[#555]">
-                          {Number(m.amountMonthly).toLocaleString("da-DK")} kr / md • d.{m.dayOfMonth}
-                          {m.endDate ? ` • slutter ${m.endDate}` : ""}
-                        </div>
+
                         <div className="text-xs text-[#888]">
+                          {m.company?.category && <span className="mr-2">{m.company.category}</span>}
+                          {m.amountMonthly && m.dayOfMonth && (
+                            <span className="mr-2">
+                              {m.amountMonthly} kr. den {m.dayOfMonth}. hver måned
+                            </span>
+                          )}
                           Oprettet {new Date(m.createdAt).toLocaleString("da-DK")}
                           {m.note ? ` • Notat: ${m.note}` : ""}
                         </div>

@@ -1,5 +1,5 @@
 import NextCors from "nextjs-cors";
-import { findCompanyByAccount } from '../../service/categorizeService';
+import { findCompanyByRefAndCredNo } from '../../service/categorizeService';
 
 export default async function handler(req, res) {
   await NextCors(req, res, {
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const company = findCompanyByAccount(String(creditorNo), String(referenceNo), String(fikNo), comment || "");
+    const company = findCompanyByRefAndCredNo(String(creditorNo), String(referenceNo), String(fikNo), comment || "");
 
     return res.status(200).json({
       name: company.name,

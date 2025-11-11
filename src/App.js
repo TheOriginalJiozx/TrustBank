@@ -10,6 +10,7 @@ import InvoicePayment from "./pages/transaction/invoicepayment";
 import Transactions from './pages/transactions';
 import PaymentService from "./pages/pservice";
 import Cardusage from "./pages/cardusage";
+import DoesNotExist from "./doesnotexist";
 
 function App() {
     useEffect(() => {
@@ -33,6 +34,8 @@ function App() {
                     <Route path="/account" element={<Account />} />
                     <Route path="/pbs" element={<PaymentService />} />
                     <Route path="/cardusage" element={<Cardusage />} />
+                    <Route path="/404" element={<DoesNotExist />} />
+                    <Route path="*" element={<Navigate to="/404" replace />} />
                 </Routes>
             </main>
 

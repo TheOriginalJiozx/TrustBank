@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import NextCors from "nextjs-cors";
+import { findCompanyByDebGrNrAndPbsNo } from "../../service/categorizeService";
+import crypto from "crypto";
 
 console.log("[directdebits] HIT", new Date().toISOString());
 
@@ -16,7 +18,6 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
-
   if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
   if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, JSON.stringify({}, null, 2));
 
@@ -28,12 +29,10 @@ export default async function handler(req, res) {
     users = {};
   }
 
-
   const getCardsForUser = (username) => {
     const u = users[username];
     if (!u) return null;
     if (Array.isArray(u)) return u;
-
     return [u];
   };
 
@@ -63,20 +62,21 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Angiv username eller (regNo & accNo)" });
     }
 
-
     case "POST": {
       const {
         username,
         regNo,
         accNo,
-        company,
+        pbsNo,
+        debGrNr,
+        customerNo,
+        company: manualCompany,
         amountMonthly,
         dayOfMonth,
-        endDate,
         note = "",
       } = req.body || {};
 
-      if (!username || !regNo || !accNo || !company || !amountMonthly || !dayOfMonth) {
+      if (!username || !regNo || !accNo || !pbsNo || !debGrNr || !customerNo || !amountMonthly || !dayOfMonth) {
         return res.status(400).json({ error: "Manglende felter" });
       }
 
@@ -88,14 +88,24 @@ export default async function handler(req, res) {
       );
       if (!card) return res.status(404).json({ error: "Kort/konto ikke fundet" });
 
+      const recognizedCompany = findCompanyByDebGrNrAndPbsNo(debGrNr, pbsNo);
+
       card.directDebits = card.directDebits || [];
 
       const newMandate = {
         id: crypto.randomUUID(),
-        company: String(company).trim(),
+        company: recognizedCompany || manualCompany || {
+          name: "Ukendt virksomhed",
+          category: "Ukendt kategori",
+          pbsNo: String(pbsNo).trim(),
+          debGrNr: String(debGrNr).trim(),
+          matchType: "None",
+        },
+        pbsNo: String(pbsNo).trim(),
+        debGrNr: String(debGrNr).trim(),
+        customerNo: Number(customerNo),
         amountMonthly: Number(amountMonthly),
         dayOfMonth: Number(dayOfMonth),
-        endDate: endDate || null,
         note: String(note || "").trim(),
         active: true,
         createdAt: new Date().toISOString(),
@@ -106,7 +116,6 @@ export default async function handler(req, res) {
       fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
       return res.status(200).json(newMandate);
     }
-
 
     case "DELETE": {
       const { id, username } = req.query;

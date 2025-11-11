@@ -13,12 +13,10 @@ export default async function handler(req, res) {
       optionsSuccessStatus: 200,
     });
 
-    // 🔹 Sørg for at mappen "data" findes
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
 
-    // 🔹 Sørg for at filen "users.json" findes
     if (!fs.existsSync(filePath)) {
       fs.writeFileSync(filePath, JSON.stringify({}, null, 2));
     }

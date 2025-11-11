@@ -1,4 +1,4 @@
-import { findCompanyByAccount } from "../../service/categorizeService";
+import { findCompanyByRefAndCredNo } from "../../service/categorizeService";
 
 export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -13,7 +13,7 @@ export default function handler(req, res) {
   ];
 
   const results = testCases.map(description => {
-    return findCompanyByAccount("", "", description);
+    return findCompanyByRefAndCredNo("", "", description);
   });
 
   res.status(200).json(results);
