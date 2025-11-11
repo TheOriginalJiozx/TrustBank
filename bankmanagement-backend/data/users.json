@@ -50,26 +50,7 @@
           "type": "sent"
         }
       ],
-      "directDebits": [
-        {
-          "id": "6a4a11cc-88f2-4b4e-a9d6-64eeef43b520",
-          "company": {
-            "name": "Skat",
-            "category": "Offentlige Betalinger",
-            "debGrNr": "01701",
-            "pbsNo": "05123456",
-            "matchType": "Direct match (Company)"
-          },
-          "pbsNo": "05123456",
-          "debGrNr": "01701",
-          "customerNo": 123456789,
-          "amountMonthly": 150,
-          "dayOfMonth": 1,
-          "note": "",
-          "active": true,
-          "createdAt": "2025-11-11T15:11:25.733Z"
-        }
-      ]
+      "directDebits": []
     }
   ]
 }

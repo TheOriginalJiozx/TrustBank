@@ -129,9 +129,8 @@ export default async function handler(req, res) {
         if (!Array.isArray(c.directDebits)) continue;
         const idx = c.directDebits.findIndex((d) => d.id === id);
         if (idx !== -1) {
-          c.directDebits[idx].active = false;
-          c.directDebits[idx].canceledAt = new Date().toISOString();
           removed = c.directDebits[idx];
+          c.directDebits.splice(idx, 1);
           break;
         }
       }
