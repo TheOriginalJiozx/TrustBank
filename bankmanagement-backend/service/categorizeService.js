@@ -380,6 +380,39 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
     return direct;
   }
 
+  let bestMatch = null;
+  let bestScore = 0;
+
+  for (const [catName, catData] of Object.entries(categories)) {
+    for (const c of catData.companies) {
+      const nameScore = stringSimilarity.compareTwoStrings(comment.toLowerCase(), c.name.toLowerCase());
+      const categoryBonus = 1 / parseInt(catData.priority);
+      const historyBoost = previousMatches.has(c.creditorNo) ? 0.1 : 0;
+
+      const combinedScore =
+        nameScore * adaptiveWeights.name +
+        categoryBonus * adaptiveWeights.category +
+        historyBoost * adaptiveWeights.history;
+
+      if (combinedScore > bestScore) {
+        bestScore = combinedScore;
+        bestMatch = { ...c, category: catName, matchScore: combinedScore };
+      }
+    }
+  }
+
+  if (bestMatch && bestScore > 0.3) {
+    previousMatches.set(bestMatch.creditorNo, (previousMatches.get(bestMatch.creditorNo) || 0) + 1);
+
+    if (previousMatches.size % 10 === 0) {
+      adaptiveWeights.name = Math.min(0.7, adaptiveWeights.name + 0.02);
+      adaptiveWeights.history = Math.min(0.3, adaptiveWeights.history + 0.01);
+    }
+
+    companyCache.set(cacheKey, bestMatch);
+    return bestMatch;
+  }
+
   const fallback = {
     name: comment || "Ukendt firma",
     category: "Ukendt kategori",
