@@ -209,14 +209,14 @@ Use this space to list resources you find helpful and would like to give credit 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/TheOriginalJiozx/TrustBank.svg?style=for-the-badge&nocache=1
-[contributors-url]: https://github.com/TheOriginalJiozx/TrustBank/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/TheOriginalJiozx/TrustBank.svg?style=for-the-badge&nocache=1
+[contributors-shield]: https://img.shields.io/github/contributors/TheOriginalJiozx/TrustBank.svg?style=for-the-badge
+[contributors-url]: https://github.com/TheOriginalJiozx/TrustBank/graphs/contributor
+[forks-shield]: https://img.shields.io/github/forks/TheOriginalJiozx/TrustBank.svg?style=for-the-badge
 [forks-url]: https://github.com/TheOriginalJiozx/TrustBank/network/members
-[stars-shield]: https://img.shields.io/github/stars/TheOriginalJiozx/TrustBank.svg?style=for-the-badge&nocache=1
+[stars-shield]: https://img.shields.io/github/stars/TheOriginalJiozx/TrustBank.svg?style=for-the-badge
 [stars-url]: https://github.com/TheOriginalJiozx/TrustBank/stargazers
-[issues-shield]: https://img.shields.io/github/issues/TheOriginalJiozx/TrustBank.svg?style=for-the-badge&nocache=1
-[issues-url]: https://github.com/TheOriginalJiozx/TrustBank/issues
+[issues-shield]: https://img.shields.io/github/issues/TheOriginalJiozx/TrustBank.svg?style=for-the-badge
+[issues-url]: https://github.com/TheOriginalJiozx/TrustBank/issues&nocache=1
 [product-screenshot]: readme_images/screenshot.png
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 [Next-url]: https://nextjs.org/
