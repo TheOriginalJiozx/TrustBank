@@ -58,7 +58,38 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://localhost:3000)
 
----- SKRIV HER ----
+# Intelligent Virksomhedskategorisering for Banktransaktioner
+
+Dette projekt har til formål at automatisere og forbedre kategorisering af banktransaktioner. Systemet identificerer virksomheder ud fra forskellige betalingsdata som `creditorNo`, `referenceNo` og `fikNo`, samt information fra kommentarer på transaktioner.
+
+## Funktioner
+
+- **Hurtigt opslag via Map-struktur**
+  - Virksomheder gemmes i en mappe-struktur for hurtig og effektiv adgang, selv ved store datamængder.
+
+- **Intelligent matchscore**
+  - Direkte match på betalingsdata foretrækkes.
+  - Hvis direkte match ikke findes, beregnes et score-baseret match baseret på:
+    - Tekstlig lighed mellem transaktion og virksomhedsnavn
+    - Historiske matches
+    - Kategoriforhold og prioritering
+  - Højest scorende match vælges.
+
+- **Adaptiv cache og læring**
+  - Tidligere matches gemmes for at optimere fremtidige søgninger.
+  - Cachen forbedrer både performance og præcision over tid.
+
+- **Kategorisering og rapportering**
+  - Virksomheder grupperes i relevante kategorier som Dagligvarer, Transport, Streaming, Bank & Økonomi osv.
+  - Understøtter analyser, rapporter og kundeindsigt.
+
+## Formål
+
+Denne løsning hjælper banken med at:  
+
+- Automatisere store dele af transaktionshåndteringen  
+- Reducere manuel indsats  
+- Tilbyde kunderne mere præcise kategoriseringer og bedre indsigt i deres forbrug
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -126,8 +157,8 @@ Use this space to show useful examples of how a project can be used. Additional 
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Add Changelog
-- [x] Add back to top links
+- [x] CRUD for transaktioner
+- [ ] Test algoritmerne på rigtig data
 
 See the [open issues](https://github.com/TheOriginalJiozx/TrustBank/issues) for a full list of proposed features (and known issues).
 
@@ -178,13 +209,13 @@ Use this space to list resources you find helpful and would like to give credit 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/TheOriginalJiozx/TrustBank.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/TheOriginalJiozx/TrustBank.svg?style=for-the-badge&nocache=1
 [contributors-url]: https://github.com/TheOriginalJiozx/TrustBank/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/TheOriginalJiozx/TrustBank.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/TheOriginalJiozx/TrustBank.svg?style=for-the-badge&nocache=1
 [forks-url]: https://github.com/TheOriginalJiozx/TrustBank/network/members
-[stars-shield]: https://img.shields.io/github/stars/TheOriginalJiozx/TrustBank.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/TheOriginalJiozx/TrustBank.svg?style=for-the-badge&nocache=1
 [stars-url]: https://github.com/TheOriginalJiozx/TrustBank/stargazers
-[issues-shield]: https://img.shields.io/github/issues/TheOriginalJiozx/TrustBank.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/TheOriginalJiozx/TrustBank.svg?style=for-the-badge&nocache=1
 [issues-url]: https://github.com/TheOriginalJiozx/TrustBank/issues
 [product-screenshot]: readme_images/screenshot.png
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
