@@ -366,15 +366,13 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
       for (const c of catData.companies) {
         global.companyIndex.set(c.creditorNo, { ...c, category: catName });
         global.companyIndex.set(c.referenceNo, { ...c, category: catName });
-        global.companyIndex.set(c.fikNo, { ...c, category: catName });
       }
     }
   }
 
   const direct =
     global.companyIndex.get(creditorNo) ||
-    global.companyIndex.get(referenceNo) ||
-    global.companyIndex.get(fikNo);
+    global.companyIndex.get(referenceNo);
   if (direct) {
     companyCache.set(cacheKey, direct);
     return direct;
@@ -401,7 +399,7 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
     }
   }
 
-  if (bestMatch && bestScore > 0.3) {
+  if (bestMatch && bestScore > 0.3 && stringSimilarity.compareTwoStrings(comment.toLowerCase(), bestMatch.name.toLowerCase()) > 0.2) {
     previousMatches.set(bestMatch.creditorNo, (previousMatches.get(bestMatch.creditorNo) || 0) + 1);
 
     if (previousMatches.size % 10 === 0) {

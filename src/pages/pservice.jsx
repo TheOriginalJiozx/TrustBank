@@ -14,7 +14,7 @@ export default function PaymentService() {
     debGrNr: "",
     customerNo: "",
     amountMonthly: "",
-    dayOfMonth: "",
+    dayOfMonth: "1",
     note: "",
   });
 
@@ -28,6 +28,70 @@ export default function PaymentService() {
   const navigate = useNavigate();
 
   const apiBase = "http://localhost:3001/api";
+
+  const generateAmount = (customerNo) => {
+    const charSum = [...customerNo].reduce((sum, c) => sum + c.charCodeAt(0), 0);
+    const seed = (charSum % 1000) / 1000;
+
+    const min = 175;
+    const max = 750;
+
+    const amount = Math.floor(min + seed * (max - min));
+
+    return amount;
+  }
+
+  const generateCustomerNo = (companyName = "") => {
+    const clean = companyName.trim().toUpperCase();
+
+    const charSum = [...clean].reduce((sum, c) => sum + c.charCodeAt(0), 0);
+    const seed = (charSum % 10) / 10;
+
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const digits = "0123456789";
+    const mix = letters + digits;
+
+    const prefix = clean
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2);
+
+    let patternType;
+    if (seed < 0.3) patternType = "numbers";
+    else if (seed < 0.6) patternType = "letters";
+    else patternType = "mixed";
+
+    let result = "";
+    const length = 9;
+
+    for (let i = 0; i < length; i++) {
+      if (patternType === "numbers") result += digits[Math.floor(Math.random() * digits.length)];
+      else if (patternType === "letters") result += letters[Math.floor(Math.random() * letters.length)];
+      else result += mix[Math.floor(Math.random() * mix.length)];
+    }
+
+    return (prefix + result).slice(0, 9);
+  };
+
+  useEffect(() => {
+    if (form.pbsNo.length === 8 && form.debGrNr.length >= 5) {
+      const combined = `${form.pbsNo}${form.debGrNr}`;
+      const newCustomerNo = generateCustomerNo(combined);
+      const newAmount = generateAmount(newCustomerNo);
+      formData((p) => ({
+        ...p,
+        customerNo: newCustomerNo,
+        amountMonthly: newAmount,
+      }));
+    } else {
+      formData((p) => ({
+        ...p,
+        customerNo: "",
+        amountMonthly: "",
+      }));
+    }
+  }, [form.pbsNo, form.debGrNr]);
 
   const loadMandates = async (accNo, regNo) => {
     setLoadingMandates(true);
@@ -43,7 +107,18 @@ export default function PaymentService() {
   };
 
   const reformData = () =>
-    formData({ company: "", pbsNo: "", debGrNr: "", customerNo: "", amountMonthly: "", dayOfMonth: "", note: "" });
+  formData((p) => {
+    const newCustomerNo = generateCustomerNo(`${p.pbsNo}${p.debGrNr}`);
+    const newAmount = generateAmount(newCustomerNo);
+
+    return {
+      ...p,
+      company: "",
+      note: "",
+      customerNo: newCustomerNo,
+      amountMonthly: newAmount,
+    };
+  });
 
   useEffect(() => {
     const raw = localStorage.getItem("loggedInUser");
@@ -105,6 +180,10 @@ export default function PaymentService() {
     e.preventDefault();
     if (!selectedCard) return alert("Vælg et kort først.");
 
+    if (!form.pbsNo || !form.debGrNr || !form.customerNo) {
+      return setServerResponse({ error: "Manglende felter i formularen." });
+    }
+
     const payload = {
       username: selectedCard.username,
       regNo: selectedCard.regNo,
@@ -124,6 +203,7 @@ export default function PaymentService() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
       const data = await res.json().catch(() => ({}));
       setServerResponse(res.ok ? data : { error: data?.error || "Kunne ikke oprette betalingsservice." });
 
@@ -249,7 +329,7 @@ export default function PaymentService() {
                   value={form.pbsNo}
                   onChange={handleChange}
                   maxLength={8}
-                  placeholder="Fx 150"
+                  placeholder="Indtast 8 cifres PBS-nummer"
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   required
                 />
@@ -266,7 +346,7 @@ export default function PaymentService() {
                   value={form.debGrNr}
                   onChange={handleChange}
                   minLength={5}
-                  placeholder="Fx 150"
+                  placeholder="Indtast minimum 5 cifres debitor gruppe nummer"
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   required
                 />
@@ -283,42 +363,13 @@ export default function PaymentService() {
                   value={form.customerNo}
                   onChange={handleChange}
                   maxLength={9}
-                  placeholder="Fx 150"
+                  placeholder="9 cifre kundenummer"
                   className="w-full border border-gray-300 rounded px-3 py-2"
-                  required
+                  required disabled={true}
                 />
                 {errors.customerNo && (
                   <p className="text-red-600 text-sm mt-1">{errors.customerNo}</p>
                 )}
-              </div>
-
-              <div>
-                <label htmlFor="amountMonthly" className="block mb-1 font-medium">Beløb</label>
-                <input
-                  id="amountMonthly"
-                  type="text"
-                  step=".01"
-                  value={form.amountMonthly}
-                  onChange={handleChange}
-                  placeholder="Fx 150"
-                  className="w-full border border-gray-300 rounded px-3 py-2"
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="dayOfMonth" className="block mb-1 font-medium">Trækningsdag (1–31)</label>
-                <input
-                  id="dayOfMonth"
-                  type="number"
-                  min="1"
-                  max="31"
-                  value={form.dayOfMonth}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2"
-                  required
-                />
-                <p className="text-xs text-gray-500 mt-1">1-31</p>
               </div>
 
               <div>

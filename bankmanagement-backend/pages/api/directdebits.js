@@ -103,7 +103,7 @@ export default async function handler(req, res) {
         },
         pbsNo: String(pbsNo).trim(),
         debGrNr: String(debGrNr).trim(),
-        customerNo: Number(customerNo),
+        customerNo: String(customerNo),
         amountMonthly: Number(amountMonthly),
         dayOfMonth: Number(dayOfMonth),
         note: String(note || "").trim(),
