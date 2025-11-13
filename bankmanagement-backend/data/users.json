@@ -28,6 +28,83 @@
           "comment": "Test",
           "timestamp": "2025-11-09T17:19:08.498Z",
           "type": "sent"
+        },
+        {
+          "company": "Ukendt",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19283745",
+          "receiverReferenceNo": "583920174658291",
+          "fikNo": "+71",
+          "amount": "150",
+          "comment": "Test",
+          "timestamp": "2025-11-13T16:58:26.948Z",
+          "type": "sent"
+        },
+        {
+          "company": "Ukendt",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19283745",
+          "receiverReferenceNo": "583920174658291",
+          "fikNo": "+71",
+          "amount": "150",
+          "comment": "",
+          "timestamp": "2025-11-13T16:59:00.924Z",
+          "type": "sent"
+        },
+        {
+          "company": "Ukendt",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19283745",
+          "receiverReferenceNo": "583920174658291",
+          "fikNo": "+71",
+          "amount": "150",
+          "comment": "",
+          "timestamp": "2025-11-13T16:59:21.236Z",
+          "type": "sent"
+        },
+        {
+          "company": "Ukendt",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19283745",
+          "receiverReferenceNo": "583920174658291",
+          "fikNo": "+71",
+          "amount": "150",
+          "comment": "",
+          "timestamp": "2025-11-13T17:02:11.412Z",
+          "type": "sent"
+        },
+        {
+          "company": "Ukendt",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19283745",
+          "receiverReferenceNo": "583920174658291",
+          "fikNo": "+71",
+          "amount": "150",
+          "comment": "",
+          "timestamp": "2025-11-13T17:05:12.257Z",
+          "type": "sent"
+        },
+        {
+          "company": "Røde Kors",
+          "category": "Velgørenhed",
+          "receiverCreditorNo": "19283745",
+          "receiverReferenceNo": "583920174658291",
+          "fikNo": "+71",
+          "amount": "150",
+          "comment": "",
+          "timestamp": "2025-11-13T17:17:51.569Z",
+          "type": "sent"
+        },
+        {
+          "company": "Røde Kors",
+          "category": "Velgørenhed",
+          "receiverCreditorNo": "19283743",
+          "receiverReferenceNo": "583920174658291",
+          "fikNo": "+71",
+          "amount": "150",
+          "comment": "",
+          "timestamp": "2025-11-13T17:18:22.573Z",
+          "type": "sent"
         }
       ]
     },

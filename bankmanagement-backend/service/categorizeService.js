@@ -2,6 +2,10 @@ import fs from "fs";
 import path from "path";
 import stringSimilarity from "string-similarity";
 
+let companyCache = new Map(); // Hurtig cache
+let adaptiveWeights = { name: 0.6, category: 0.25, history: 0.15 };
+let previousMatches = new Map(); // husker tidligere matchede creditorNo + resultater
+
 const filePath = path.join(process.cwd(), "data", "users.json");
 
 function loadUsersData() {
@@ -348,60 +352,43 @@ function buildCategories(usersData) {
   return categories;
 }
 
-export function findCompanyByRefAndCredNo(creditorNo, referenceNo, description = "") {
-  creditorNo = String(creditorNo).trim();
-  referenceNo = String(referenceNo).trim();
+export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = "") {
+  const categories = buildCategories(loadUsersData());
 
-  const usersData = loadUsersData();
-  const categories = buildCategories(usersData);
+  const cacheKey = `${creditorNo}_${referenceNo}_${fikNo}_${comment}`;
+  if (companyCache.has(cacheKey)) {
+    return { ...companyCache.get(cacheKey), fromCache: true };
+  }
 
-  for (const [category, { companies }] of Object.entries(categories)) {
-    const company = companies.find(
-      c => String(c.creditorNo).trim() === creditorNo && String(c.referenceNo).trim() === referenceNo
-    );
-    if (company) {
-        return {
-          name: company.name,
-          category,
-          creditorNo,
-          referenceNo,
-          matchType: "Direct match (Company)",
-        };
+  if (!global.companyIndex) {
+    global.companyIndex = new Map();
+    for (const [catName, catData] of Object.entries(categories)) {
+      for (const c of catData.companies) {
+        global.companyIndex.set(c.creditorNo, { ...c, category: catName });
+        global.companyIndex.set(c.referenceNo, { ...c, category: catName });
+        global.companyIndex.set(c.fikNo, { ...c, category: catName });
       }
-    }
-
-  const allCompanies = Object.entries(categories)
-    .filter(([category]) => category !== "Ukendt kategori")
-    .flatMap(([category, { companies }]) => companies.map(c => ({ ...c, category })));
-
-  const names = allCompanies.map(c => c.name);
-
-  const words = description.split(/\s+/);
-
-  for (const word of words) {
-    const { bestMatch, bestMatchIndex } = stringSimilarity.findBestMatch(word, names);
-
-    if (bestMatch.rating > 0.8) {
-      const bestCompany = allCompanies[bestMatchIndex];
-      return {
-        name: "Ukendt virksomhed",
-        category: bestCompany.category,
-        creditorNo,
-        referenceNo,
-        matchWord: word,
-        matchType: "Fuzzy match (word)",
-      };
     }
   }
 
-  return {
-    name: "Ukendt virksomhed",
+  const direct =
+    global.companyIndex.get(creditorNo) ||
+    global.companyIndex.get(referenceNo) ||
+    global.companyIndex.get(fikNo);
+  if (direct) {
+    companyCache.set(cacheKey, direct);
+    return direct;
+  }
+
+  const fallback = {
+    name: comment || "Ukendt firma",
     category: "Ukendt kategori",
     creditorNo,
     referenceNo,
-    comment: description,
-    matchType: "None",
+    fikNo,
   };
+  companyCache.set(cacheKey, fallback);
+  return fallback;
 }
 
 export function findCompanyByDebGrNrAndPbsNo(debGrNr, pbsNo) {
