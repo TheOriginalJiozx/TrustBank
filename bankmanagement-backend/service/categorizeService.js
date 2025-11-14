@@ -1,10 +1,20 @@
+/*
+• Map til hurtigere opslag (O(1))
+
+• Kombineret match-score (intelligent beslutning), altså hvis der ikke findes et direkte match,
+  skal algoritmen så skal eksempelvis tekstlig lighed og kategoriforhold og tidligere matches
+  vægtes og så bliver det højest scorende resultat valgt
+
+• Cache / adaptiv logik
+*/
+
 import fs from "fs";
 import path from "path";
 import stringSimilarity from "string-similarity";
 
-let companyCache = new Map(); // Hurtig cache
+let companyCache = new Map();
 let adaptiveWeights = { name: 0.6, category: 0.25, history: 0.15 };
-let previousMatches = new Map(); // husker tidligere matchede creditorNo + resultater
+let previousMatches = new Map();
 
 const filePath = path.join(process.cwd(), "data", "users.json");
 

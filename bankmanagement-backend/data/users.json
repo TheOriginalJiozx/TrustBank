@@ -8,14 +8,14 @@
       "cvv": "714",
       "transactions": [
         {
-          "company": "TUI",
-          "category": "Rejser & Ferie",
-          "receiverCreditorNo": "49281736",
-          "receiverReferenceNo": "203984751628493",
+          "company": "Netto",
+          "category": "Dagligvarer",
+          "receiverCreditorNo": "28745193",
+          "receiverReferenceNo": "153984726051487",
           "fikNo": "+71",
-          "amount": "11",
+          "amount": "15",
           "comment": "test",
-          "timestamp": "2025-11-09T16:57:14.644Z",
+          "timestamp": "2025-11-14T08:56:23.536Z",
           "type": "sent"
         }
       ],

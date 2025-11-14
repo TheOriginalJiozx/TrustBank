@@ -12,6 +12,9 @@ export default function Post() {
     comment: "",
     company: "",
     category: "",
+    referenceNo: "",
+    creditorNo: "",
+    fikNo: "",
   });
   const [responseData, setResponseData] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
