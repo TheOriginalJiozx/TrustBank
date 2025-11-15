@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# bank data
+/realdata
+
 # next.js
 /.next/
 /out/

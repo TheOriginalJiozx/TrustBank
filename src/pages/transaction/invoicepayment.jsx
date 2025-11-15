@@ -9,7 +9,6 @@ export default function Post() {
     accNo: "",
     regNo: "",
     amount: "",
-    comment: "",
     company: "",
     category: "",
     referenceNo: "",
@@ -83,7 +82,7 @@ export default function Post() {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/api/findCompany?creditorNo=${formData.creditorNo}&referenceNo=${formData.referenceNo}&fikNo=${formData.fikNo}&comment=${encodeURIComponent(formData.comment)}`
+        `http://localhost:3001/api/findCompany?creditorNo=${formData.creditorNo}&referenceNo=${formData.referenceNo}&fikNo=${formData.fikNo}`
       );
       if (res.ok) {
         const company = await res.json();
@@ -113,7 +112,6 @@ export default function Post() {
             receiverCreditorNo: formData.creditorNo,
             receiverReferenceNo: formData.referenceNo,
             amount: formData.amount,
-            comment: formData.comment,
             fikNo: formData.fikNo,
           }),
         }
@@ -283,20 +281,6 @@ export default function Post() {
                 />
               </div>
 
-              <div className="flex flex-col text-left">
-                <label htmlFor="comment" className="mb-1 font-medium">
-                  Kommentar
-                </label>
-                <input
-                  type="text"
-                  id="comment"
-                  value={formData.comment || ""}
-                  onChange={handleChange}
-                  placeholder="Kommentar / Beskrivelse"
-                  className="border border-gray-300 rounded px-3 py-2"
-                />
-              </div>
-
               <button
                 type="button"
                 onClick={handlePayment}
@@ -320,7 +304,6 @@ export default function Post() {
                     <p><span className="font-semibold">Reference nummer:</span> {formData.referenceNo}</p>
                     <p><span className="font-semibold">Kreditor nummer:</span> {formData.creditorNo}</p>
                     <p><span className="font-semibold">Beløb:</span> {formData.amount}</p>
-                    <p><span className="font-semibold">Kommentar:</span> {formData.comment || "-"}</p>
                   </div>
 
                   <div className="flex justify-center gap-4">

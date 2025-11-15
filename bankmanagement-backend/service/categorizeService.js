@@ -1,16 +1,5 @@
-/*
-• Map til hurtigere opslag (O(1))
-
-• Kombineret match-score (intelligent beslutning), altså hvis der ikke findes et direkte match,
-  skal algoritmen så skal eksempelvis tekstlig lighed og kategoriforhold og tidligere matches
-  vægtes og så bliver det højest scorende resultat valgt
-
-• Cache / adaptiv logik
-*/
-
 import fs from "fs";
 import path from "path";
-import stringSimilarity from "string-similarity";
 
 let companyCache = new Map();
 let adaptiveWeights = { name: 0.6, category: 0.25, history: 0.15 };
@@ -43,7 +32,7 @@ function buildCategories(usersData) {
       { name: "Salling", creditorNo: "95172638", referenceNo: "825916037284158", pbsNo: "06217454", debGrNr: "00001", fikNo: "+71" },
       { name: "SuperBrugsen", creditorNo: "06372849", referenceNo: "938172650493861", pbsNo: "08891235", debGrNr: "00005", fikNo: "+71" },
       { name: "Dagli'Brugsen", creditorNo: "17839405", referenceNo: "049382716594027", pbsNo: "08891236", debGrNr: "00005", fikNo: "+71" },
-      { name: "Coop365", creditorNo: "74295061", referenceNo: "153948726105489", pbsNo: "08891237", debGrNr: "00005", fikNo: "+71" },
+      { name: "Coop 365", creditorNo: "74295061", referenceNo: "153948726105489", pbsNo: "08891237", debGrNr: "00005", fikNo: "+71" },
       { name: "7-Eleven", creditorNo: "86739512", referenceNo: "267594831726520", pbsNo: "15632892", debGrNr: "00004", fikNo: "+71" },
       { name: "Aldi", creditorNo: "95831724", referenceNo: "371605984273618", pbsNo: "31567235", debGrNr: "00003", fikNo: "+71" }
     ]
@@ -162,7 +151,7 @@ function buildCategories(usersData) {
       { name: "Fitness World", creditorNo: "23982475", referenceNo: "268012340787874", pbsNo: "64567890", debGrNr: "00604", fikNo: "+71" },
       { name: "SATS", creditorNo: "24319568", referenceNo: "283286189950408", pbsNo: "64567891", debGrNr: "00604", fikNo: "+71" },
       { name: "Loop Fitness", creditorNo: "24638751", referenceNo: "298560039112942", pbsNo: "64567892", debGrNr: "00604", fikNo: "+71" },
-      { name: "PureGym", creditorNo: "24897623", referenceNo: "313833888275476", pbsNo: "64567893", debGrNr: "00604", fikNo: "+71" },
+      { name: "Pure Gym", creditorNo: "24897623", referenceNo: "313833888275476", pbsNo: "64567893", debGrNr: "00604", fikNo: "+71" },
       { name: "Det Sunde Valg", creditorNo: "25138479", referenceNo: "329107737438010", pbsNo: "64567894", debGrNr: "00604", fikNo: "+71" }
     ]
   },
@@ -177,7 +166,7 @@ function buildCategories(usersData) {
       { name: "RUC", creditorNo: "31958376", referenceNo: "596138274950263", pbsNo: "71234571", debGrNr: "00701", fikNo: "+71" },
       { name: "CBS", creditorNo: "32049715", referenceNo: "607294851362748", pbsNo: "71234572", debGrNr: "00701", fikNo: "+71" },
       { name: "Professionshøjskolen Absalon", creditorNo: "32176584", referenceNo: "718365294817305", pbsNo: "72345678", debGrNr: "00702", fikNo: "+71" },
-      { name: "KEA", creditorNo: "32281497", referenceNo: "829471635092816", pbsNo: "72345679", debGrNr: "00702", fikNo: "+71" },
+      { name: "Københavns Erhvervsakademi", creditorNo: "32281497", referenceNo: "829471635092816", pbsNo: "72345679", debGrNr: "00702", fikNo: "+71" },
       { name: "Aalborg Handelsskole", creditorNo: "32359718", referenceNo: "934586217403927", pbsNo: "73456789", debGrNr: "00703", fikNo: "+71" },
       { name: "ZBC", creditorNo: "32471659", referenceNo: "104729583614092", pbsNo: "73456790", debGrNr: "00703", fikNo: "+71" }
     ]
@@ -362,13 +351,183 @@ function buildCategories(usersData) {
   return categories;
 }
 
+function normalizeString(str) {
+  // Normaliserer teksten: små bogstaver, erstat @ med ø, fjern uønskede tegn
+  return String(str || "")
+    .toLowerCase()
+    .replace(/@/g, "ø")                  
+    .replace(/[^a-z0-9æøå&-]/g, " ")     
+    .replace(/\s+/g, " ")                
+    .trim();
+}
+
+// --- FILTRERING AF STØJORD ------------------------------------
+
+const NOISE_TOKENS = new Set([
+  "a","as","a s","a/s","aps","ap s",
+  "co","co.","inc","ltd",
+  "ab","iv","og","mv","dk",
+  "the","and","for","til","fra","med","to","of"
+]);
+
+const ALLOWED_SHORT_TOKENS = new Set([
+  "su" // korte tilladte tokens
+]);
+
+function isNoiseToken(tok) {
+  if (!tok) return true;
+  if (/^\d+$/.test(tok)) return true; // rene tal er støj
+  const t = tok.replace(/\./g, "").trim();
+  if (NOISE_TOKENS.has(t)) return true;
+  if (t.length === 1 && !ALLOWED_SHORT_TOKENS.has(t)) return true; // enkeltbogstav ikke tilladt
+  return false;
+}
+
+// --- HELORD SIMILARITY ---------------------------------------
+
+function wholeWordSimilarity(a, b) {
+  if (!a || !b) return 0;
+
+  const aWords = String(a).toLowerCase().split(/\s+/);
+  const bWords = String(b).toLowerCase().split(/\s+/);
+
+  let matches = 0;
+  const maxWords = Math.max(aWords.length, bWords.length);
+
+  for (const aw of aWords) {
+    for (const bw of bWords) {
+      if (aw === bw) matches++;
+    }
+  }
+
+  return matches === 0 ? 0 : matches / maxWords;
+}
+
+// --- GENERERING AF SUBSTRINGS ---------------------------------
+
+function generateSubstrings(str) {
+  const normalized = normalizeString(str);
+  if (!normalized) return [];
+
+  const segments = normalized.split(/[&-]/)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const subs = [];
+
+  for (const segment of segments) {
+    const words = segment.split(" ").filter(w => !isNoiseToken(w));
+    for (let i = 0; i < words.length; i++) {
+      let current = "";
+      for (let j = i; j < words.length; j++) {
+        current = current ? current + " " + words[j] : words[j];
+        subs.push(current);
+      }
+    }
+  }
+
+  subs.sort((a, b) => b.length - a.length);
+  return subs;
+}
+
+// --- BLOKORD --------------------------------------------------
+
+const BLOCK_WORDS = [
+  "overførsel","overfoersel",
+  "mobilepay","giro","iban","swift",
+  "udl","kortbetaling"
+];
+
+function isBlocked(text) {
+  const n = normalizeString(text);
+  return BLOCK_WORDS.some(w => n.includes(w));
+}
+
+// --- MATCHING REGLER ------------------------------------------
+
+const MIN_NAME_SIMILARITY = 0.72;
+const MIN_TOKEN_SIMILARITY = 0.82;
+
+// --- CHECK: &-tegn -------------------------------------------
+function shouldMatchWithAmpersand(a, b) {
+  const hasAmpA = a.includes("&");
+  const hasAmpB = b.includes("&");
+  return hasAmpA === hasAmpB; // kun match hvis begge har & eller ingen har
+}
+
+// --- HJÆLPEFUNKTION ------------------------------------------
+function escapeRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// --- HOVEDMATCH FUNKTION -------------------------------------
+function bestSubstringMatch(comment, companyName) {
+  if (isBlocked(comment)) return 0;
+
+  // --- &-check: stop tidligt hvis mismatch ---
+  if (!shouldMatchWithAmpersand(comment, companyName)) return 0;
+
+  const normComment = normalizeString(comment);
+  const target = normalizeString(companyName);
+  if (!target) return 0;
+
+  // --- 1. Korte firmaer (≤2 bogstaver) ---
+  // må kun matche, hvis hele kommentaren er præcis samme længde
+  if (target.length <= 2) {
+    if (normComment === target) return 1.0;
+    return 0;
+  }
+
+  const commentWords = normComment.split(" ").filter(w => !isNoiseToken(w));
+  const targetWords = target.split(" ").filter(w => !isNoiseToken(w));
+
+  // --- 2. Prefix-match ---
+  // længere firmaer kan matches som prefix, også hvis kommentaren er ét langt ord
+  const prefixRegex = new RegExp("^" + escapeRegex(target));
+  if (prefixRegex.test(normComment)) return 1.0;
+
+  // --- 3. Full-word match ---
+  // alle firmaets ord skal findes som hele ord i kommentaren
+  const allWordsMatch = targetWords.every(word => {
+    const r = new RegExp("\\b" + escapeRegex(word) + "\\b", "i");
+    return r.test(normComment);
+  });
+  if (allWordsMatch) return 1.0;
+
+  // --- 4. Substring fallback ---
+  // substrings må kun matche hele ord
+  let best = 0;
+  const commentSegments = normComment.split(/[&-]/).map(p => p.trim()).filter(Boolean);
+  for (const segment of commentSegments) {
+    const subs = generateSubstrings(segment);
+    for (const s of subs) {
+      if (!s || s.length < 3) continue;
+
+      const sWords = s.split(/\s+/);
+      const allWordsExist = sWords.every(sw => targetWords.includes(sw));
+      if (!allWordsExist) continue;
+
+      const score = wholeWordSimilarity(s, target);
+      if (score >= MIN_TOKEN_SIMILARITY) return 1.0;
+      if (score > best) best = score;
+    }
+  }
+
+  // boost for enkelte-ord firmaer
+  if (!target.includes(" ") && best >= MIN_NAME_SIMILARITY - 0.05) {
+    best += 0.05;
+    if (best > 1) best = 1.0;
+  }
+
+  return best;
+}
+
+// --- HOVEDFUNKTION: FIND VIRKSOMHED ---------------------------
 export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = "") {
   const categories = buildCategories(loadUsersData());
 
   const cacheKey = `${creditorNo}_${referenceNo}_${fikNo}_${comment}`;
-  if (companyCache.has(cacheKey)) {
-    return { ...companyCache.get(cacheKey), fromCache: true };
-  }
+  if (companyCache.has(cacheKey)) return { ...companyCache.get(cacheKey), fromCache: true };
 
   if (!global.companyIndex) {
     global.companyIndex = new Map();
@@ -380,9 +539,7 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
     }
   }
 
-  const direct =
-    global.companyIndex.get(creditorNo) ||
-    global.companyIndex.get(referenceNo);
+  const direct = global.companyIndex.get(creditorNo) || global.companyIndex.get(referenceNo);
   if (direct) {
     companyCache.set(cacheKey, direct);
     return direct;
@@ -393,8 +550,10 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
 
   for (const [catName, catData] of Object.entries(categories)) {
     for (const c of catData.companies) {
-      const nameScore = stringSimilarity.compareTwoStrings(comment.toLowerCase(), c.name.toLowerCase());
-      const categoryBonus = 1 / parseInt(catData.priority);
+      const nameScore = bestSubstringMatch(comment, c.name);
+      if (nameScore < MIN_NAME_SIMILARITY) continue;
+
+      const categoryBonus = 1 / parseInt(catData.priority || 1);
       const historyBoost = previousMatches.has(c.creditorNo) ? 0.1 : 0;
 
       const combinedScore =
@@ -409,7 +568,7 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
     }
   }
 
-  if (bestMatch && bestScore > 0.3 && stringSimilarity.compareTwoStrings(comment.toLowerCase(), bestMatch.name.toLowerCase()) > 0.2) {
+  if (bestMatch) {
     previousMatches.set(bestMatch.creditorNo, (previousMatches.get(bestMatch.creditorNo) || 0) + 1);
 
     if (previousMatches.size % 10 === 0) {
@@ -417,16 +576,21 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
       adaptiveWeights.history = Math.min(0.3, adaptiveWeights.history + 0.01);
     }
 
+    if (bestScore < 0.85) {
+      console.warn("Low-confidence match:", comment, "→", bestMatch.name, "score:", bestScore);
+    }
+
     companyCache.set(cacheKey, bestMatch);
     return bestMatch;
   }
 
+  // fallback hvis intet match
   const fallback = {
     name: comment || "Ukendt firma",
     category: "Ukendt kategori",
     creditorNo,
     referenceNo,
-    fikNo,
+    fikNo
   };
   companyCache.set(cacheKey, fallback);
   return fallback;

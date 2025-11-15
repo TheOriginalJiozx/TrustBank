@@ -17,6 +17,36 @@
           "comment": "test",
           "timestamp": "2025-11-14T08:56:23.536Z",
           "type": "sent"
+        },
+        {
+          "company": "Ukendt firma",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19384756",
+          "receiverReferenceNo": "582947361028473",
+          "fikNo": "+71",
+          "amount": "14.99",
+          "timestamp": "2025-11-14T20:21:59.599Z",
+          "type": "sent"
+        },
+        {
+          "company": "Skat",
+          "category": "Offentlige Betalinger",
+          "receiverCreditorNo": "19384756",
+          "receiverReferenceNo": "582947361028473",
+          "fikNo": "+71",
+          "amount": "14.99",
+          "timestamp": "2025-11-14T20:28:33.356Z",
+          "type": "sent"
+        },
+        {
+          "company": "Skat",
+          "category": "Offentlige Betalinger",
+          "receiverCreditorNo": "19384756",
+          "receiverReferenceNo": "582947361028473",
+          "fikNo": "+71",
+          "amount": "14.99",
+          "timestamp": "2025-11-14T20:47:05.058Z",
+          "type": "sent"
         }
       ],
       "directDebits": []
