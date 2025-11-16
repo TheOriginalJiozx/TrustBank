@@ -5,7 +5,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 
-<!-- PROJECT LOGO -->
+<!-- PROJEKT LOGO -->
 <br />
 <div align="center">
   <a href="https://github.com/TheOriginalJiozx/TrustBank">
@@ -14,49 +14,48 @@
 
   <h3 align="center">TrustBank README</h3>
 
-  <p align="center">
-    An awesome README template to jumpstart your projects!
+<p align="center">
     <br />
-    <a href="https://github.com/TheOriginalJiozx/TrustBank"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/TheOriginalJiozx/TrustBank"><strong>Udforsk dokumentationen »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/TheOriginalJiozx/TrustBank">View Demo</a>
+    <a href="https://github.com/TheOriginalJiozx/TrustBank">Se Demo</a>
     &middot;
-    <a href="https://github.com/TheOriginalJiozx/TrustBank/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/TheOriginalJiozx/TrustBank/issues/new?labels=bug&template=bug-report---.md">Rapporter fejl</a>
     &middot;
-    <a href="https://github.com/TheOriginalJiozx/TrustBank/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/TheOriginalJiozx/TrustBank/issues/new?labels=enhancement&template=feature-request---.md">Anmod om funktion</a>
   </p>
 </div>
 
-<!-- TABLE OF CONTENTS -->
+<!-- INDHOLDSFORTEGNELSE -->
 <details>
-  <summary>Table of Contents</summary>
+  <summary>Indholdsfortegnelse</summary>
   <ol>
     <li>
-      <a href="#about-the-project">About The Project</a>
+      <a href="#about-the-project">Om Projektet</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#built-with">Bygget Med</a></li>
       </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
+      <a href="#getting-started">Kom Godt I Gang</a>
       <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#prerequisites">Forudsætninger</a></li>
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li><a href="#usage">Brug</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#contributing">Bidrag</a></li>
+    <li><a href="#contact">Kontakt</a></li>
+    <li><a href="#acknowledgments">Tak</a></li>
   </ol>
 </details>
 
-<!-- ABOUT THE PROJECT -->
-## About The Project
+<!-- OM PROJEKTET -->
+## Om Projektet
 
-[![Product Name Screen Shot][product-screenshot]](https://localhost:3000)
+[![Produkt Skærmbillede][product-screenshot]](https://localhost:3000)
 
 # Intelligent Virksomhedskategorisering for Banktransaktioner
 
@@ -91,28 +90,25 @@ Denne løsning hjælper banken med at:
 - Reducere manuel indsats  
 - Tilbyde kunderne mere præcise kategoriseringer og bedre indsigt i deres forbrug
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">til toppen</a>)</p>
 
-### Built With
+### Bygget Med
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
+Dette afsnit viser de vigtigste frameworks/biblioteker brugt til at starte projektet. Eventuelle ekstra plugins kan nævnes under tak. Her er nogle eksempler:
 
 * [![Next][Next.js]][Next-url]
 * [![React][React.js]][React-url]
 * [![Lucide-React][Lucide-React.ts]][Lucide-React-url]
 * [![Tailwind][TailwindCSS]][TailwindCSS-url]
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">til toppen</a>)</p>
 
-<!-- GETTING STARTED -->
-## Getting Started
+## Kom Godt I Gang
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+### Forudsætninger
 
-### Prerequisites
+Installér seneste version af npm
 
-This is an example of how to list things you need to use the software and how to install them.
 * npm
   ```sh
   npm install npm@latest -g
@@ -120,63 +116,63 @@ This is an example of how to list things you need to use the software and how to
 
 ### Installation
 
-1. Clone the repo
+1. Klon repositoriet
    ```sh
    git clone https://github.com/TheOriginalJiozx/TrustBank.git
    ```
-2. Install NPM packages
+2. Installér NPM packages
    ```sh
    npm install
    ```
-3. Change git remote url to avoid accidental pushes to base project
+3. Skift git remote url for at undgå uheldige pushes til base project
    ```sh
    git remote set-url origin github_username/repo_name
    git remote -v # confirm the changes
    ```
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">til toppen</a>)</p>
 
-### Run project
+### Kør projektet
 
-1. Start frontend in a terminal
+1. Start frontend i en terminal
    ```sh
    npm start
    ```
-2. Start backend in another terminal
+2. Start backend i en anden terminal
    ```sh
    npm run dev
    ```
 
-<!-- USAGE EXAMPLES -->
-## Usage
+<!-- BRUGSEKSEMPLER -->
+## Brug
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+Brug dette afsnit til at vise nyttige eksempler på, hvordan projektet kan anvendes. Skærmbilleder, kodeeksempler og demoer fungerer godt her. Du kan også linke til yderligere ressourcer.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">til toppen</a>)</p>
 
 <!-- ROADMAP -->
 ## Roadmap
 
 - [x] CRUD for transaktioner
-- [ ] Test algoritmerne på rigtig data
+- [x] Test algoritmerne på rigtig data
 
-See the [open issues](https://github.com/TheOriginalJiozx/TrustBank/issues) for a full list of proposed features (and known issues).
+Se [åbne issues](https://github.com/TheOriginalJiozx/TrustBank/issues) for en komplet liste over foreslåede funktioner (og kendte problemer).
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">til toppen</a>)</p>
 
-<!-- CONTRIBUTING -->
-## Contributing
+<!-- BIDRAG -->
+## Bidrag
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Bidrag er det, der gør open source-community så fantastisk at lære, inspirere og skabe. Enhver form for bidrag er meget værdsat.
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
+Hvis du har en idé til forbedringer, kan du fork repoen og lave en pull request. Du kan også blot oprette en issue med tagget "enhancement".  
+Glem ikke at give projektet en stjerne! Tak!
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. Fork projektet
+2. Opret din feature-branch (`git checkout -b feature/AmazingFeature`)
+3. Commit dine ændringer (`git commit -m 'Tilføj AmazingFeature'`)
+4. Push til branchen (`git push origin feature/AmazingFeature`)
+5. Lav en Pull Request
 
 ### Top contributors:
 
@@ -184,28 +180,26 @@ Don't forget to give the project a star! Thanks again!
   <img src="https://contrib.rocks/image?repo=TheOriginalJiozx/TrustBank&nocache=1" alt="contrib.rocks image" />
 </a>
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">til toppen</a>)</p>
 
-<!-- CONTACT -->
-## Contact
+<!-- KONTAKT -->
+## Kontakt
 
 Omar Al-Ali - [TheOriginalJiozx](https://github.com/TheOriginalJiozx)<p />
 Yasin Dhalin - [Dhalinn](https://github.com/Dhalinn) <p />
 Maksym Yuzefovych - [Maksyuze](https://github.com/maksyuze456)
 
-Project Link: [https://github.com/TheOriginalJiozx/TrustBank](https://github.com/TheOriginalJiozx/TrustBank)
+Projekt Link: [https://github.com/TheOriginalJiozx/TrustBank](https://github.com/TheOriginalJiozx/TrustBank)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">til toppen</a>)</p>
 
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
+<!-- SPECIELT TAK TIL -->
+## Specielt tak til
 
 * [Img Shields](https://shields.io)
 * [Lucide React Icons](https://react-icons.github.io/react-icons/icons/lu/)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">til toppen</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
