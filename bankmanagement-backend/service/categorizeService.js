@@ -352,11 +352,13 @@ function buildCategories(usersData) {
 }
 
 function normalizeString(str) {
-  // Normaliserer teksten: små bogstaver, erstat @ med ø, fjern uønskede tegn
+  // sætter normal values, istedet for mærkelig tegn
   return String(str || "")
     .toLowerCase()
-    .replace(/@/g, "ø")                  
-    .replace(/[^a-z0-9æøå&-]/g, " ")     
+    .replace(/@/g, "ø")
+    .replace(/oe/g, "ø")
+    .replace(/ï¿½/g, "ø")
+    .replace(/[^a-z0-9æøå&-]/g, " ")
     .replace(/\s+/g, " ")                
     .trim();
 }
@@ -471,11 +473,12 @@ function bestSubstringMatch(comment, companyName) {
   const target = normalizeString(companyName);
   if (!target) return 0;
 
-  // --- 1. Korte firmaer (≤2 bogstaver) ---
-  // må kun matche, hvis hele kommentaren er præcis samme længde
+
+  // hvis de kommer som et helt ord i kommentaren
   if (target.length <= 2) {
-    if (normComment === target) return 1.0;
-    return 0;
+      const regex = new RegExp("\\b" + escapeRegex(target) + "\\b", "i");
+      if (regex.test(normComment)) return 1.0;
+      return 0;
   }
 
   const commentWords = normComment.split(" ").filter(w => !isNoiseToken(w));
