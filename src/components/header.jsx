@@ -33,7 +33,6 @@ function Header() {
     { label: 'Kort & forbrug', value: '/cardusage' },
     { label: 'Betal faktura', value: '/payment' },
     { label: 'Betalingsservice', value: '/pbs' },
-    { label: 'Lån & kredit', value: '/loans' },
   ];
 
   const handleSelect = (option) => {
@@ -82,10 +81,6 @@ function Header() {
             absolute mt-2 w-56 rounded-2xl bg-white shadow-xl ring-1 ring-black/5 p-2 z-50"
           placeholderClassName="font-medium text-black"
         />
-
-        <a href="/contact" className="text-black-800 font-medium hover:text-black-600 transition h-full flex items-center">
-          Kontakt
-        </a>
 
         {user ? (
           <button
