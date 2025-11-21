@@ -1,3 +1,5 @@
+Klik [her](EVALUERING.md) for at læse vores EVALUERING.md.
+
 <a id="readme-top"></a>
 
 [![Contributors][contributors-shield]][contributors-url]
