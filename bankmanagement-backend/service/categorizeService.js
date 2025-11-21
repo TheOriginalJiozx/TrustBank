@@ -17,7 +17,7 @@ function loadUsersData() {
   }
 }
 
-function buildCategories(usersData) {
+function buildCategories() {
   const categories = {
   "Dagligvarer": {
     priority: "1",

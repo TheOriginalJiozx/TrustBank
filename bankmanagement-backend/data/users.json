@@ -17,6 +17,182 @@
           "comment": "test",
           "timestamp": "2025-11-14T08:56:23.536Z",
           "type": "sent"
+        },
+        {
+          "company": "nto",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19384789",
+          "receiverReferenceNo": "582947361028474",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "nto",
+          "timestamp": "2025-11-21T12:47:21.584Z",
+          "type": "sent"
+        },
+        {
+          "company": "Netto",
+          "category": "Dagligvarer",
+          "receiverCreditorNo": "28745193",
+          "receiverReferenceNo": "153984726051487",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Nett",
+          "timestamp": "2025-11-21T12:56:11.070Z",
+          "type": "sent"
+        },
+        {
+          "company": "Nett",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "28745196",
+          "receiverReferenceNo": "153984726051481",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Nett",
+          "timestamp": "2025-11-21T12:56:21.776Z",
+          "type": "sent"
+        },
+        {
+          "company": "Netta",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "28745196",
+          "receiverReferenceNo": "153984726051481",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Netta",
+          "timestamp": "2025-11-21T12:56:32.420Z",
+          "type": "sent"
+        },
+        {
+          "company": "Natto",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "28745196",
+          "receiverReferenceNo": "153984726051481",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Natto",
+          "timestamp": "2025-11-21T12:56:38.129Z",
+          "type": "sent"
+        },
+        {
+          "company": "Netto",
+          "category": "Dagligvarer",
+          "receiverCreditorNo": "28745196",
+          "receiverReferenceNo": "153984726051481",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Netto",
+          "timestamp": "2025-11-21T12:56:45.007Z",
+          "type": "sent"
+        },
+        {
+          "company": "Natto",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19384789",
+          "receiverReferenceNo": "582947361028416",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Natto",
+          "timestamp": "2025-11-21T13:00:20.491Z",
+          "type": "sent"
+        },
+        {
+          "company": "Natto",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19384789",
+          "receiverReferenceNo": "582947361028416",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Natto",
+          "timestamp": "2025-11-21T13:00:41.044Z",
+          "type": "sent"
+        },
+        {
+          "company": "Natto",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19384789",
+          "receiverReferenceNo": "582947361028416",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Natto",
+          "timestamp": "2025-11-21T13:00:43.626Z",
+          "type": "sent"
+        },
+        {
+          "company": "Natto",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19384789",
+          "receiverReferenceNo": "582947361028416",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Natto",
+          "timestamp": "2025-11-21T13:02:11.797Z",
+          "type": "sent"
+        },
+        {
+          "company": "Netto",
+          "category": "Dagligvarer",
+          "receiverCreditorNo": "19384789",
+          "receiverReferenceNo": "153984726051487",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Natto",
+          "timestamp": "2025-11-21T13:14:19.927Z",
+          "type": "sent"
+        },
+        {
+          "company": "Netto",
+          "category": "Dagligvarer",
+          "receiverCreditorNo": "19384789",
+          "receiverReferenceNo": "153984726051481",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Natto",
+          "timestamp": "2025-11-21T13:14:55.873Z",
+          "type": "sent"
+        },
+        {
+          "company": "Netto",
+          "category": "Dagligvarer",
+          "receiverCreditorNo": "19384789",
+          "receiverReferenceNo": "153984726051481",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Nett",
+          "timestamp": "2025-11-21T13:15:16.989Z",
+          "type": "sent"
+        },
+        {
+          "company": "Natt",
+          "category": "Ukendt kategori",
+          "receiverCreditorNo": "19384789",
+          "receiverReferenceNo": "153984726051481",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Natt",
+          "timestamp": "2025-11-21T13:15:26.800Z",
+          "type": "sent"
+        },
+        {
+          "company": "Netto",
+          "category": "Dagligvarer",
+          "receiverCreditorNo": "19384789",
+          "receiverReferenceNo": "153984726051481",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Netto",
+          "timestamp": "2025-11-21T13:20:43.670Z",
+          "type": "sent"
+        },
+        {
+          "company": "Netto",
+          "category": "Dagligvarer",
+          "receiverCreditorNo": "12345678",
+          "receiverReferenceNo": "153984726051480",
+          "fikNo": "+71",
+          "amount": "15",
+          "comment": "Netto",
+          "timestamp": "2025-11-21T13:21:27.426Z",
+          "type": "sent"
         }
       ],
       "directDebits": []
