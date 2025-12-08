@@ -1,11 +1,14 @@
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
 export let companyCache = new Map();
 export let adaptiveWeights = { name: 0.6, category: 0.25, history: 0.15 };
 export let previousMatches = new Map();
 
-const filePath = path.join(__dirname, "../data/users.json"); // relativ til categorizeService.js
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const filePath = path.join(__dirname, "../data/users.json");
 
 function loadUsersData() {
   try {
@@ -483,7 +486,7 @@ function bestSubstringMatch(comment, companyName) {
       // 2. Hvis kommentaren KUN er navnet → valid
       if (commentTokens.length === 1 && commentTokens[0] === target) return 1.0;
 
-      // 3. Ellers: ingen match (forhindrer "Ikea Taastrup If")
+      // 3. Ellers: ingen match (forhindrer f.eks. at "Ikea Taastrup If" matcher med "If")
       return 0;
   }
 

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Benchmark Results - Cache Performance Analysis</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      color: #2d3748;
+      margin-bottom: 10px;
+      font-size: 2.5em;
+      font-weight: 700;
+    }
+    .subtitle {
+      color: #718096;
+      margin-bottom: 30px;
+      font-size: 1.1em;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 25px;
+      border-radius: 12px;
+      color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .stat-card h3 {
+      font-size: 0.9em;
+      opacity: 0.9;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .stat-card .value {
+      font-size: 2.5em;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .stat-card .label {
+      font-size: 0.85em;
+      opacity: 0.8;
+    }
+    .chart-container {
+      margin-bottom: 50px;
+      background: #f7fafc;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    .chart-container h2 {
+      color: #2d3748;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+    .chart-wrapper {
+      position: relative;
+      height: 400px;
+    }
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    .comparison-table th,
+    .comparison-table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .comparison-table th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85em;
+      letter-spacing: 1px;
+    }
+    .comparison-table tr:hover {
+      background: #f7fafc;
+    }
+    .improvement {
+      color: #48bb78;
+      font-weight: 600;
+    }
+    .metric-name {
+      font-weight: 600;
+      color: #2d3748;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #e2e8f0;
+      color: #718096;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Microbenchmark Results</h1>
+    <p class="subtitle">Cache Performance Analysis - Generated 8.12.2025, 23.20.38</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Speedup Factor</h3>
+        <div class="value">6.0x</div>
+        <div class="label">Hurtigere med warm cache</div>
+      </div>
+      <div class="stat-card">
+        <h3>Runtime Reduction</h3>
+        <div class="value">83.5%</div>
+        <div class="label">Mindre total runtime</div>
+      </div>
+      <div class="stat-card">
+        <h3>Latency Reduction</h3>
+        <div class="value">83.5%</div>
+        <div class="label">Mindre gennemsnitlig latency</div>
+      </div>
+      <div class="stat-card">
+        <h3>Total Runs</h3>
+        <div class="value">660</div>
+        <div class="label">Målinger per pass</div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <h2>📊 Latency Distribution (Histogram)</h2>
+      <div class="chart-wrapper">
+        <canvas id="histogramChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <h2>📈 Performance Metrics Comparison</h2>
+      <div class="chart-wrapper">
+        <canvas id="comparisonChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <h2>📉 Percentile Analysis</h2>
+      <div class="chart-wrapper">
+        <canvas id="percentileChart"></canvas>
+      </div>
+    </div>
+
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Cold Cache</th>
+          <th>Warm Cache</th>
+          <th>Improvement</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="metric-name">Average Time</td>
+          <td>0.6227 ms</td>
+          <td>0.1030 ms</td>
+          <td class="improvement">83.5% hurtigere</td>
+        </tr>
+        <tr>
+          <td class="metric-name">Median Time (P50)</td>
+          <td>0 ms</td>
+          <td>0 ms</td>
+          <td class="improvement">0 ms forskel</td>
+        </tr>
+        <tr>
+          <td class="metric-name">P95 Latency</td>
+          <td>2 ms</td>
+          <td>1 ms</td>
+          <td class="improvement">50.0% bedre</td>
+        </tr>
+        <tr>
+          <td class="metric-name">P99 Latency</td>
+          <td>3 ms</td>
+          <td>1 ms</td>
+          <td class="improvement">66.7% bedre</td>
+        </tr>
+        <tr>
+          <td class="metric-name">Standard Deviation</td>
+          <td>0.9220 ms</td>
+          <td>0.3040 ms</td>
+          <td class="improvement">67.0% strammere</td>
+        </tr>
+        <tr>
+          <td class="metric-name">Min Time</td>
+          <td>0 ms</td>
+          <td>0 ms</td>
+          <td>0 ms forskel</td>
+        </tr>
+        <tr>
+          <td class="metric-name">Max Time</td>
+          <td>8 ms</td>
+          <td>1 ms</td>
+          <td class="improvement">7 ms forskel</td>
+        </tr>
+        <tr>
+          <td class="metric-name">Total Runtime</td>
+          <td>411 ms</td>
+          <td>68 ms</td>
+          <td class="improvement">83.5% hurtigere</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <footer>
+      <p>🔬 Microbenchmark kørt på Node v22.20.0 | Test: Cold vs. Warm Cache Performance</p>
+    </footer>
+  </div>
+
+  <script>
+    const chartColors = {
+      cold: 'rgba(239, 68, 68, 0.8)',
+      warm: 'rgba(34, 197, 94, 0.8)',
+      coldBorder: 'rgba(239, 68, 68, 1)',
+      warmBorder: 'rgba(34, 197, 94, 1)',
+    };
+
+    // Histogram Chart
+    new Chart(document.getElementById('histogramChart'), {
+      type: 'bar',
+      data: {
+        datasets: [
+          {
+            label: 'Cold Cache',
+            data: [{"x":0,"y":384},{"x":0.5,"y":0},{"x":1,"y":173},{"x":1.5,"y":0},{"x":2,"y":86},{"x":2.5,"y":0},{"x":3,"y":11},{"x":3.5,"y":0},{"x":4,"y":3},{"x":4.5,"y":0},{"x":5,"y":1},{"x":5.5,"y":0},{"x":6,"y":0},{"x":6.5,"y":0},{"x":7,"y":0},{"x":7.5,"y":0},{"x":8,"y":2}],
+            backgroundColor: chartColors.cold,
+            borderColor: chartColors.coldBorder,
+            borderWidth: 1,
+          },
+          {
+            label: 'Warm Cache',
+            data: [{"x":0,"y":592},{"x":0.5,"y":0},{"x":1,"y":68}],
+            backgroundColor: chartColors.warm,
+            borderColor: chartColors.warmBorder,
+            borderWidth: 1,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            type: 'linear',
+            title: { display: true, text: 'Latency (ms)', font: { size: 14, weight: 'bold' } },
+            ticks: { stepSize: 1 }
+          },
+          y: {
+            title: { display: true, text: 'Frequency (antal målinger)', font: { size: 14, weight: 'bold' } },
+            beginAtZero: true
+          }
+        },
+        plugins: {
+          legend: { display: true, position: 'top' },
+          tooltip: {
+            callbacks: {
+              label: (context) => `${context.dataset.label}: ${context.parsed.y} målinger ved ~${context.parsed.x}ms`
+            }
+          }
+        }
+      }
+    });
+
+    // Comparison Chart
+    new Chart(document.getElementById('comparisonChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Gennemsnit', 'Median', 'Std Dev', 'Min', 'Max'],
+        datasets: [
+          {
+            label: 'Cold Cache',
+            data: [0.6227, 0, 0.922, 0, 8],
+            backgroundColor: chartColors.cold,
+            borderColor: chartColors.coldBorder,
+            borderWidth: 2,
+          },
+          {
+            label: 'Warm Cache',
+            data: [0.103, 0, 0.304, 0, 1],
+            backgroundColor: chartColors.warm,
+            borderColor: chartColors.warmBorder,
+            borderWidth: 2,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            title: { display: true, text: 'Tid (ms)', font: { size: 14, weight: 'bold' } },
+            beginAtZero: true
+          }
+        },
+        plugins: {
+          legend: { display: true, position: 'top' }
+        }
+      }
+    });
+
+    // Percentile Chart
+    new Chart(document.getElementById('percentileChart'), {
+      type: 'line',
+      data: {
+        labels: ['P50 (Median)', 'P75', 'P95', 'P99'],
+        datasets: [
+          {
+            label: 'Cold Cache',
+            data: [0, 1, 2, 3],
+            backgroundColor: chartColors.cold,
+            borderColor: chartColors.coldBorder,
+            borderWidth: 3,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+          },
+          {
+            label: 'Warm Cache',
+            data: [0, 0, 1, 1],
+            backgroundColor: chartColors.warm,
+            borderColor: chartColors.warmBorder,
+            borderWidth: 3,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            title: { display: true, text: 'Latency (ms)', font: { size: 14, weight: 'bold' } },
+            beginAtZero: true
+          }
+        },
+        plugins: {
+          legend: { display: true, position: 'top' },
+          tooltip: {
+            callbacks: {
+              label: (context) => `${context.dataset.label}: ${context.parsed.y}ms`
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
