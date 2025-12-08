@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
 
-let companyCache = new Map();
-let adaptiveWeights = { name: 0.6, category: 0.25, history: 0.15 };
-let previousMatches = new Map();
+export let companyCache = new Map();
+export let adaptiveWeights = { name: 0.6, category: 0.25, history: 0.15 };
+export let previousMatches = new Map();
 
-const filePath = path.join(process.cwd(), "data", "users.json");
+const filePath = path.join(__dirname, "../data/users.json"); // relativ til categorizeService.js
 
 function loadUsersData() {
   try {
@@ -17,7 +17,7 @@ function loadUsersData() {
   }
 }
 
-function buildCategories() {
+export function buildCategories() {
   const categories = {
   "Dagligvarer": {
     priority: "1",
@@ -435,8 +435,7 @@ function generateSubstrings(str) {
 // --- BLOKORD --------------------------------------------------
 
 const BLOCK_WORDS = [
-  "overførsel","overfoersel",
-  "mobilepay","giro","iban","swift",
+  "overførsel","overfoersel","giro","iban","swift",
   "udl","kortbetaling"
 ];
 
@@ -471,13 +470,20 @@ function bestSubstringMatch(comment, companyName) {
 
   const normComment = normalizeString(comment);
   const target = normalizeString(companyName);
+  
   if (!target) return 0;
 
-
-  // hvis de kommer som et helt ord i kommentaren
+  // --- SPECIALREGLER FOR 1-2 BOGSTAVS NAVNE ------------------------
   if (target.length <= 2) {
-      const regex = new RegExp("\\b" + escapeRegex(target) + "\\b", "i");
-      if (regex.test(normComment)) return 1.0;
+      const commentTokens = normComment.split(/\s+/);
+
+      // 1. Hvis kommentaren starter med navnet → valid match
+      if (commentTokens[0] === target) return 1.0;
+
+      // 2. Hvis kommentaren KUN er navnet → valid
+      if (commentTokens.length === 1 && commentTokens[0] === target) return 1.0;
+
+      // 3. Ellers: ingen match (forhindrer "Ikea Taastrup If")
       return 0;
   }
 

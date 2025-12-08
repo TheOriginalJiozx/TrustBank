@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "csv-parser": "^3.2.0",
@@ -28,6 +29,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "jest": "^30.2.0",
+    "nyc": "^17.1.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
