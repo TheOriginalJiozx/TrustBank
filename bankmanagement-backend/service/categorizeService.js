@@ -6,10 +6,22 @@ export let companyCache = new Map();
 export let adaptiveWeights = { name: 0.6, category: 0.25, history: 0.15 };
 export let previousMatches = new Map();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const primaryUserPath = path.join(__dirname, "..", "data", "users.json");
-const fallbackUserPath = path.join(process.cwd(), "data", "users.json");
+// Detect if running in Jest test environment
+const isJestEnvironment = typeof process !== 'undefined' && process.env.JEST_WORKER_ID !== undefined;
+
+let primaryUserPath, fallbackUserPath;
+
+if (isJestEnvironment) {
+  // Jest environment - use process.cwd() directly
+  primaryUserPath = path.join(process.cwd(), "data", "users.json");
+  fallbackUserPath = path.join(process.cwd(), "data", "users.json");
+} else {
+  // Normal runtime - use import.meta.url
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  primaryUserPath = path.join(__dirname, "..", "data", "users.json");
+  fallbackUserPath = path.join(process.cwd(), "data", "users.json");
+}
 
 function loadUsersData() {
   const candidatePaths = [primaryUserPath, fallbackUserPath];

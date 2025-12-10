@@ -10,7 +10,8 @@ function getCompany(categoryName, index = 0) {
 describe('findCompanyAdvanced', () => {
 
   beforeAll(() => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    // Mock console.warn to suppress warnings during tests
+    global.console.warn = () => {};
   });
 
   beforeEach(() => {
