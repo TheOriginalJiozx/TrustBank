@@ -43,6 +43,10 @@ I dette projekt har AI været brugt til forskellige formål, herunder:
 
    * AI blev brugt til at oprette tests, hvilket hjalp med at sikre korrekt funktionalitet af algoritmerne.
 
+5. **Micrebenchmarking**
+
+   * AI blev brugt til at lave vores microbenchmarking, hvilket hjalp os med at bekræfte de tænkte asymptotiske kompleksiteter, så vi havde en form for belæg (3 i alt).
+
 ### AI-værktøjer brugt
 
 * Vi har brugt AI gennem chatbots (ChatGPT).

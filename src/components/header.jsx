@@ -78,7 +78,7 @@ function Header() {
           arrowClosed={<Arrow className="text-gray-700" />}
           arrowOpen={<Arrow className="text-gray-700 rotate-180" />}
           menuClassName="
-            absolute mt-2 w-56 rounded-2xl bg-white shadow-xl ring-1 ring-black/5 p-2 z-50"
+            absolute mt-2 w-50 rounded-2xl bg-white shadow-xl ring-1 ring-black/5 p-2 z-50"
           placeholderClassName="font-medium text-black"
         />
 

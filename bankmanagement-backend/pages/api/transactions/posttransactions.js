@@ -44,6 +44,11 @@ export default async function handler(req, res) {
           String(card.accNo) === String(senderAccNo).trim()
         ) {
           card.transactions = card.transactions || [];
+          const now = new Date();
+          const timestampLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+            .toISOString()
+            .replace(/Z$/, "");
+
           const newTransaction = {
             company: company || "Ukendt virksomhed",
             category: category || "Ukendt kategori",
@@ -52,7 +57,7 @@ export default async function handler(req, res) {
             fikNo,
             amount,
             comment,
-            timestamp: new Date().toISOString(),
+              timestamp: timestampLocal, // lokal tid, ingen UTC felt
             type: "sent",
           };
           card.transactions.push(newTransaction);

@@ -4,7 +4,7 @@ import NextCors from "nextjs-cors";
 import { findCompanyByDebGrNrAndPbsNo } from "../../service/categorizeService";
 import crypto from "crypto";
 
-console.log("[directdebits] HIT", new Date().toISOString());
+console.log("[directdebits] KALD", new Date().toISOString());
 
 const dirPath = path.join(process.cwd(), "data");
 const filePath = path.join(dirPath, "users.json");

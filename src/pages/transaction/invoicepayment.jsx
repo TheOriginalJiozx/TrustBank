@@ -344,6 +344,10 @@ export default function Post() {
               </div>
             )}
 
+            <div className="mt-6" />
+
+           ## Algorithm Visualizer Component Her
+
             {responseData && (
               <div className="mt-10 bg-white p-4 rounded shadow w-full text-left">
                 <h2 className="text-xl font-bold mb-2">Respons:</h2>
