@@ -614,7 +614,178 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
   return fallback;
 }
 
-// Ny funktion
+export function findCompanyAdvancedWithSteps(creditorNo, referenceNo, fikNo, comment = "") {
+  const steps = [];
+  const categories = buildCategories(loadUsersData());
+
+  const cacheKey = `${creditorNo}_${referenceNo}_${fikNo}_${comment}`;
+
+  steps.push({
+    stage: "initialization",
+    title: "🔍 Initialisering",
+    description: "Starter søgeprocessen",
+    data: { creditorNo, referenceNo, fikNo, comment }
+  });
+
+  if (companyCache.has(cacheKey)) {
+    steps.push({
+      stage: "cache_hit",
+      title: "⚡ Cache Hit!",
+      description: "Resultatet blev fundet i cache",
+      data: companyCache.get(cacheKey),
+      duration: "< 1ms"
+    });
+    return { result: { ...companyCache.get(cacheKey), fromCache: true }, steps };
+  }
+
+  steps.push({
+    stage: "cache_miss",
+    title: "❌ Cache Miss",
+    description: "Intet match i cache - starter matching algoritme",
+    data: { cacheKey }
+  });
+
+  // Build index
+  if (!global.companyIndex) {
+    steps.push({
+      stage: "building_index",
+      title: "🏗️ Bygger Indeks",
+      description: "Indexerer alle virksomheder for hurtigere søgning",
+      data: { status: "building" }
+    });
+
+    global.companyIndex = new Map();
+    let indexedCount = 0;
+    for (const [catName, catData] of Object.entries(categories)) {
+      for (const c of catData.companies) {
+        global.companyIndex.set(c.creditorNo, { ...c, category: catName });
+        global.companyIndex.set(c.referenceNo, { ...c, category: catName });
+        indexedCount++;
+      }
+    }
+
+    steps.push({
+      stage: "index_complete",
+      title: "✅ Indeks Færdigt",
+      description: `${indexedCount} virksomheder indekseret`,
+      data: { totalIndexed: indexedCount }
+    });
+  }
+
+  // Direct match attempt
+  steps.push({
+    stage: "direct_match_attempt",
+    title: "🎯 Direkte Match-forsøg",
+    description: "Søger efter eksakt match via kreditor/reference nummere",
+    data: { creditorNo, referenceNo }
+  });
+
+  const direct = global.companyIndex.get(creditorNo) || global.companyIndex.get(referenceNo);
+  if (direct) {
+    steps.push({
+      stage: "direct_match_found",
+      title: "✅ Direkte Match Fundet!",
+      description: `Matchede: ${direct.name} (${direct.category})`,
+      data: direct,
+      confidence: "100%"
+    });
+    companyCache.set(cacheKey, direct);
+    return { result: direct, steps };
+  }
+
+  steps.push({
+    stage: "fuzzy_matching",
+    title: "🔤 Fuzzy Matching",
+    description: "Starter omtrentlig tekstmatching med alle virksomheder",
+    data: {
+      adaptiveWeights,
+      minSimilarity: MIN_NAME_SIMILARITY
+    }
+  });
+
+  let bestMatch = null;
+  let bestScore = 0;
+  const candidates = [];
+
+  for (const [catName, catData] of Object.entries(categories)) {
+    for (const c of catData.companies) {
+      const nameScore = bestSubstringMatch(comment, c.name);
+      if (nameScore < MIN_NAME_SIMILARITY) continue;
+
+      const categoryBonus = 1 / parseInt(catData.priority || 1);
+      const historyBoost = previousMatches.has(c.creditorNo) ? 0.1 : 0;
+
+      const combinedScore =
+        nameScore * adaptiveWeights.name +
+        categoryBonus * adaptiveWeights.category +
+        historyBoost * adaptiveWeights.history;
+
+      candidates.push({
+        name: c.name,
+        category: catName,
+        nameScore: parseFloat(nameScore.toFixed(4)),
+        categoryBonus: parseFloat(categoryBonus.toFixed(4)),
+        historyBoost: parseFloat(historyBoost.toFixed(4)),
+        combinedScore: parseFloat(combinedScore.toFixed(4))
+      });
+
+      if (combinedScore > bestScore) {
+        bestScore = combinedScore;
+        bestMatch = { ...c, category: catName, matchScore: combinedScore };
+      }
+    }
+  }
+
+  const sortedCandidates = candidates.sort((a, b) => b.combinedScore - a.combinedScore).slice(0, 5);
+
+  steps.push({
+    stage: "candidates_evaluated",
+    title: "📊 Kandidater Evalueret",
+    description: `${candidates.length} kandidater testet, top 5 vises nedenfor`,
+    data: { totalEvaluated: candidates.length, topCandidates: sortedCandidates }
+  });
+
+  if (bestMatch) {
+    previousMatches.set(bestMatch.creditorNo, (previousMatches.get(bestMatch.creditorNo) || 0) + 1);
+
+    if (previousMatches.size % 10 === 0) {
+      adaptiveWeights.name = Math.min(0.7, adaptiveWeights.name + 0.02);
+      adaptiveWeights.history = Math.min(0.3, adaptiveWeights.history + 0.01);
+    }
+
+    const confidence = bestScore >= 0.85 ? "Høj" : bestScore >= 0.7 ? "Medium" : "Lav";
+    const confidenceEmoji = bestScore >= 0.85 ? "✅" : bestScore >= 0.7 ? "⚠️" : "❌";
+
+    steps.push({
+      stage: "match_found",
+      title: `${confidenceEmoji} Bedste Match Fundet`,
+      description: `${bestMatch.name} (${bestMatch.category})`,
+      data: { ...bestMatch, matchScore: parseFloat(bestScore.toFixed(4)) },
+      confidence: confidence,
+      score: parseFloat(bestScore.toFixed(4))
+    });
+
+    companyCache.set(cacheKey, bestMatch);
+    return { result: { ...bestMatch, matchScore: bestScore }, steps };
+  }
+
+  steps.push({
+    stage: "no_match",
+    title: "❌ Intet Match Fundet",
+    description: "Bruger fallback - kommentarteksten som navn",
+    data: { comment }
+  });
+
+  const fallback = {
+    name: comment || "Ukendt firma",
+    category: "Ukendt kategori",
+    creditorNo,
+    referenceNo,
+    fikNo
+  };
+  companyCache.set(cacheKey, fallback);
+  return { result: fallback, steps };
+}
 
 export function findCompanyByDebGrNrAndPbsNo(debGrNr, pbsNo) {
   debGrNr = String(debGrNr).trim();

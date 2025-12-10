@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Dropdown from 'react-dropdown';
+import AlgorithmVisualizer from '../../components/AlgorithmVisualizer';
 
 export default function Post() {
   const [userCards, setUserCards] = useState([]);
@@ -346,7 +347,12 @@ export default function Post() {
 
             <div className="mt-6" />
 
-           ## Algorithm Visualizer Component Her
+            <AlgorithmVisualizer
+                creditorNo={formData.creditorNo}
+                referenceNo={formData.referenceNo}
+                fikNo={formData.fikNo}
+                comment={formData.comment}
+            />
 
             {responseData && (
               <div className="mt-10 bg-white p-4 rounded shadow w-full text-left">
