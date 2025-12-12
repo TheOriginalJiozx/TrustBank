@@ -45,11 +45,11 @@ I dette projekt har AI været brugt til forskellige formål, herunder:
 
 5. **Micrebenchmarking**
 
-   * AI blev brugt til at lave vores microbenchmarking, hvilket hjalp os med at bekræfte de tænkte asymptotiske kompleksiteter, så vi havde en form for belæg (3 i alt).
+   * AI blev brugt til at lave vores microbenchmarking, som vi ikke havde tænkt at inkludere, men det hjalp os med at estimere vores asymptotiske kompleksiteter. Vi kom dog til en anden konklussion.
 
 ### AI-værktøjer brugt
 
-* Vi har brugt AI gennem chatbots (ChatGPT).
+* Vi har brugt AI gennem chatbots (ChatGPT og CoPilot med Claude 4.5).
 * Prompts blev brugt løbende under udviklingen, men blev ikke gemt i commit-beskeder.
 
 ### Konklusion

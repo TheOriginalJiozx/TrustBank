@@ -6,17 +6,18 @@ export let companyCache = new Map();
 export let adaptiveWeights = { name: 0.6, category: 0.25, history: 0.15 };
 export let previousMatches = new Map();
 
-// Detect if running in Jest test environment
+// Tjek om vi kører i et Jest-miljø
 const isJestEnvironment = typeof process !== 'undefined' && process.env.JEST_WORKER_ID !== undefined;
 
+// Definér stier baseret på miljø
 let primaryUserPath, fallbackUserPath;
 
 if (isJestEnvironment) {
-  // Jest environment - use process.cwd() directly
+  // Når Jest kører, så brug en fixed sti
   primaryUserPath = path.join(process.cwd(), "data", "users.json");
   fallbackUserPath = path.join(process.cwd(), "data", "users.json");
 } else {
-  // Normal runtime - use import.meta.url
+  // Almindelig kørsel af applikationen
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   primaryUserPath = path.join(__dirname, "..", "data", "users.json");
@@ -29,9 +30,9 @@ function loadUsersData() {
   for (const p of candidatePaths) {
     if (!fs.existsSync(p)) continue;
     try {
-      const raw = fs.readFileSync(p, "utf8");
-      return raw ? JSON.parse(raw) : {};
-    } catch (err) {
+        const raw = fs.readFileSync(p, "utf8");
+        return raw ? JSON.parse(raw) : {};
+      } catch (err) {
     }
   }
 
