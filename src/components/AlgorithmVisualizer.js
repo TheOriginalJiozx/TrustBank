@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function AlgorithmVisualizer({ creditorNo, referenceNo, fikNo, comment }) {
   const [steps, setSteps] = useState([]);
@@ -153,6 +153,10 @@ export default function AlgorithmVisualizer({ creditorNo, referenceNo, fikNo, co
                 <span className="font-medium">Fra Cache (⚡ Blitzhurtig)</span>
               </div>
             )}
+              <div className="flex flex-wrap justify-between gap-2 bg-white/10 px-3 py-2 rounded-lg">
+                <span className="font-semibold">Behandlingstid:</span>
+                <span className="font-medium">{result.durationMs} ms</span>
+              </div>
           </div>
         </div>
       )}

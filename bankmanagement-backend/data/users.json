@@ -10,12 +10,25 @@
         {
           "company": "Netto",
           "category": "Dagligvarer",
-          "receiverCreditorNo": "19382222",
-          "receiverReferenceNo": "153984726052222",
+          "receiverCreditorNo": "19282222",
+          "receiverReferenceNo": "583920174652222",
           "fikNo": "+71",
           "amount": "150",
           "comment": "Netto",
-          "timestamp": "2025-12-10T00:29:55.785",
+          "timestamp": "2026-01-19T17:49:39.991",
+          "durationMs": 17,
+          "type": "sent"
+        },
+        {
+          "company": "Røde Kors",
+          "category": "Velgørenhed",
+          "receiverCreditorNo": "19282222",
+          "receiverReferenceNo": "583920174652222",
+          "fikNo": "+71",
+          "amount": "150",
+          "comment": "Røde Kors",
+          "timestamp": "2026-01-19T17:49:57.236",
+          "durationMs": 9,
           "type": "sent"
         }
       ],

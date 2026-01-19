@@ -16,6 +16,7 @@ export default function Post() {
     referenceNo: "",
     creditorNo: "",
     fikNo: "",
+    durationMs: "",
   });
   const [responseData, setResponseData] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -116,6 +117,7 @@ export default function Post() {
             amount: formData.amount,
             comment: formData.comment,
             fikNo: formData.fikNo,
+            duration: formData.durationMs,
           }),
         }
       );

@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 
 export let companyCache = new Map();
 export let adaptiveWeights = { name: 0.6, category: 0.25, history: 0.15 };
@@ -18,21 +17,21 @@ if (isJestEnvironment) {
   fallbackUserPath = path.join(process.cwd(), "data", "users.json");
 } else {
   // Almindelig kørsel af applikationen
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  primaryUserPath = path.join(__dirname, "..", "data", "users.json");
+  // Bestem modulmappen robust uden at bruge `import.meta` (så filen kan køres under CJS/Jest)
+  const moduleDir = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
+  primaryUserPath = path.join(moduleDir, "..", "data", "users.json");
   fallbackUserPath = path.join(process.cwd(), "data", "users.json");
 }
 
 function loadUsersData() {
   const candidatePaths = [primaryUserPath, fallbackUserPath];
 
-  for (const p of candidatePaths) {
-    if (!fs.existsSync(p)) continue;
+  for (const candidatePath of candidatePaths) {
+    if (!fs.existsSync(candidatePath)) continue;
     try {
-        const raw = fs.readFileSync(p, "utf8");
-        return raw ? JSON.parse(raw) : {};
-      } catch (err) {
+        const rawData = fs.readFileSync(candidatePath, "utf8");
+        return rawData ? JSON.parse(rawData) : {};
+      } catch (error) {
     }
   }
 
@@ -398,60 +397,60 @@ const ALLOWED_SHORT_TOKENS = new Set([
   "su" // korte tilladte tokens
 ]);
 
-function isNoiseToken(tok) {
-  if (!tok) return true;
-  if (/^\d+$/.test(tok)) return true; // rene tal er støj
-  const t = tok.replace(/\./g, "").trim();
-  if (NOISE_TOKENS.has(t)) return true;
-  if (t.length === 1 && !ALLOWED_SHORT_TOKENS.has(t)) return true; // enkeltbogstav ikke tilladt
+function isNoiseToken(token) {
+  if (!token) return true;
+  if (/^\d+$/.test(token)) return true; // rene tal er støj
+  const normalizedToken = token.replace(/\./g, "").trim();
+  if (NOISE_TOKENS.has(normalizedToken)) return true;
+  if (normalizedToken.length === 1 && !ALLOWED_SHORT_TOKENS.has(normalizedToken)) return true; // enkeltbogstav ikke tilladt
   return false;
 }
 
 // --- HELORD SIMILARITY ---------------------------------------
 
-function wholeWordSimilarity(a, b) {
-  if (!a || !b) return 0;
+function wholeWordSimilarity(stringA, stringB) {
+  if (!stringA || !stringB) return 0;
 
-  const aWords = String(a).toLowerCase().split(/\s+/);
-  const bWords = String(b).toLowerCase().split(/\s+/);
+  const wordsA = String(stringA).toLowerCase().split(/\s+/);
+  const wordsB = String(stringB).toLowerCase().split(/\s+/);
 
-  let matches = 0;
-  const maxWords = Math.max(aWords.length, bWords.length);
+  let matchCount = 0;
+  const maxWordCount = Math.max(wordsA.length, wordsB.length);
 
-  for (const aw of aWords) {
-    for (const bw of bWords) {
-      if (aw === bw) matches++;
+  for (const wordA of wordsA) {
+    for (const wordB of wordsB) {
+      if (wordA === wordB) matchCount++;
     }
   }
 
-  return matches === 0 ? 0 : matches / maxWords;
+  return matchCount === 0 ? 0 : matchCount / maxWordCount;
 }
 
 // --- GENERERING AF SUBSTRINGS ---------------------------------
 
-function generateSubstrings(str) {
-  const normalized = normalizeString(str);
-  if (!normalized) return [];
+function generateSubstrings(inputString) {
+  const normalizedString = normalizeString(inputString);
+  if (!normalizedString) return [];
 
-  const segments = normalized.split(/[&-]/)
-    .map(s => s.trim())
+  const segments = normalizedString.split(/[&-]/)
+    .map(segment => segment.trim())
     .filter(Boolean);
 
-  const subs = [];
+  const substringList = [];
 
-  for (const segment of segments) {
+   for (const segment of segments) {
     const words = segment.split(" ").filter(w => !isNoiseToken(w));
     for (let i = 0; i < words.length; i++) {
       let current = "";
       for (let j = i; j < words.length; j++) {
         current = current ? current + " " + words[j] : words[j];
-        subs.push(current);
+        substringList.push(current);
       }
     }
   }
 
-  subs.sort((a, b) => b.length - a.length);
-  return subs;
+  substringList.sort((substringA, substringB) => substringB.length - substringA.length);
+  return substringList;
 }
 
 // --- BLOKORD --------------------------------------------------
@@ -472,15 +471,15 @@ const MIN_NAME_SIMILARITY = 0.72;
 const MIN_TOKEN_SIMILARITY = 0.82;
 
 // --- CHECK: &-tegn -------------------------------------------
-function shouldMatchWithAmpersand(a, b) {
-  const hasAmpA = a.includes("&");
-  const hasAmpB = b.includes("&");
-  return hasAmpA === hasAmpB; // kun match hvis begge har & eller ingen har
+function shouldMatchWithAmpersand(stringA, stringB) {
+  const hasAmpersandA = stringA.includes("&");
+  const hasAmpersandB = stringB.includes("&");
+  return hasAmpersandA === hasAmpersandB; // kun match hvis begge har & eller ingen har
 }
 
 // --- HJÆLPEFUNKTION ------------------------------------------
-function escapeRegex(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function escapeRegex(inputString) {
+  return inputString.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 // --- HOVEDMATCH FUNKTION -------------------------------------
@@ -490,82 +489,92 @@ function bestSubstringMatch(comment, companyName) {
   // --- &-check: stop tidligt hvis mismatch ---
   if (!shouldMatchWithAmpersand(comment, companyName)) return 0;
 
-  const normComment = normalizeString(comment);
-  const target = normalizeString(companyName);
+  const normalizedComment = normalizeString(comment);
+  const normalizedCompanyName = normalizeString(companyName);
   
-  if (!target) return 0;
+  if (!normalizedCompanyName) return 0;
 
   // --- SPECIALREGLER FOR 1-2 BOGSTAVS NAVNE ------------------------
-  if (target.length <= 2) {
-      const commentTokens = normComment.split(/\s+/);
+  if (normalizedCompanyName.length <= 2) {
+      const commentTokenList = normalizedComment.split(/\s+/);
 
       // 1. Hvis kommentaren starter med navnet → valid match
-      if (commentTokens[0] === target) return 1.0;
+      if (commentTokenList[0] === normalizedCompanyName) return 1.0;
 
       // 2. Hvis kommentaren KUN er navnet → valid
-      if (commentTokens.length === 1 && commentTokens[0] === target) return 1.0;
+      if (commentTokenList.length === 1 && commentTokenList[0] === normalizedCompanyName) return 1.0;
 
       // 3. Ellers: ingen match (forhindrer f.eks. at "Ikea Taastrup If" matcher med "If")
       return 0;
   }
 
-  const commentWords = normComment.split(" ").filter(w => !isNoiseToken(w));
-  const targetWords = target.split(" ").filter(w => !isNoiseToken(w));
+  const commentWordList = normalizedComment.split(" ").filter(word => !isNoiseToken(word));
+  const companyNameWordList = normalizedCompanyName.split(" ").filter(word => !isNoiseToken(word));
 
   // --- 2. Prefix-match ---
   // længere firmaer kan matches som prefix, også hvis kommentaren er ét langt ord
-  const prefixRegex = new RegExp("^" + escapeRegex(target));
-  if (prefixRegex.test(normComment)) return 1.0;
+  const prefixRegex = new RegExp("^" + escapeRegex(normalizedCompanyName));
+  if (prefixRegex.test(normalizedComment)) return 1.0;
 
   // --- 3. Full-word match ---
   // alle firmaets ord skal findes som hele ord i kommentaren
-  const allWordsMatch = targetWords.every(word => {
-    const r = new RegExp("\\b" + escapeRegex(word) + "\\b", "i");
-    return r.test(normComment);
+  const allWordsMatch = companyNameWordList.every(companyWord => {
+    const wordRegex = new RegExp("\\b" + escapeRegex(companyWord) + "\\b", "i");
+    return wordRegex.test(normalizedComment);
   });
   if (allWordsMatch) return 1.0;
 
   // --- 4. Substring fallback ---
   // substrings må kun matche hele ord
-  let best = 0;
-  const commentSegments = normComment.split(/[&-]/).map(p => p.trim()).filter(Boolean);
-  for (const segment of commentSegments) {
-    const subs = generateSubstrings(segment);
-    for (const s of subs) {
-      if (!s || s.length < 3) continue;
+  let bestScore = 0;
+  const commentSegments = normalizedComment.split(/[&-]/).map(segmentString => segmentString.trim()).filter(Boolean);
+  for (const segmentString of commentSegments) {
+    const substringList = generateSubstrings(segmentString);
+    for (const substring of substringList) {
+      if (!substring || substring.length < 3) continue;
 
-      const sWords = s.split(/\s+/);
-      const allWordsExist = sWords.every(sw => targetWords.includes(sw));
+      const substringWordList = substring.split(/\s+/);
+      const allWordsExist = substringWordList.every(substringWord => companyNameWordList.includes(substringWord));
       if (!allWordsExist) continue;
 
-      const score = wholeWordSimilarity(s, target);
+      const score = wholeWordSimilarity(substring, normalizedCompanyName);
       if (score >= MIN_TOKEN_SIMILARITY) return 1.0;
-      if (score > best) best = score;
+      if (score > bestScore) bestScore = score;
     }
   }
 
   // boost for enkelte-ord firmaer
-  if (!target.includes(" ") && best >= MIN_NAME_SIMILARITY - 0.05) {
-    best += 0.05;
-    if (best > 1) best = 1.0;
+  if (!normalizedCompanyName.includes(" ") && bestScore >= MIN_NAME_SIMILARITY - 0.05) {
+    bestScore += 0.05;
+    if (bestScore > 1) bestScore = 1.0;
   }
 
-  return best;
+  return bestScore;
+}
+
+export function getNow() {
+  return (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
 }
 
 // --- HOVEDFUNKTION: FIND VIRKSOMHED ---------------------------
 export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = "") {
-  const categories = buildCategories(loadUsersData());
+  const categories = getCategoriesCached();
+
+  const startTime = getNow();
+  const startTimeIso = new Date().toISOString();
 
   const cacheKey = `${creditorNo}_${referenceNo}_${fikNo}_${comment}`;
-  if (companyCache.has(cacheKey)) return { ...companyCache.get(cacheKey), fromCache: true };
+  if (companyCache.has(cacheKey)) {
+    const durationMs = Math.round(getNow() - startTime);
+    return { ...companyCache.get(cacheKey), fromCache: true, durationMs, startedAt: startTimeIso };
+  }
 
   if (!global.companyIndex) {
     global.companyIndex = new Map();
-    for (const [catName, catData] of Object.entries(categories)) {
-      for (const c of catData.companies) {
-        global.companyIndex.set(c.creditorNo, { ...c, category: catName });
-        global.companyIndex.set(c.referenceNo, { ...c, category: catName });
+    for (const [categoryName, categoryData] of Object.entries(categories)) {
+      for (const company of categoryData.companies) {
+        global.companyIndex.set(company.creditorNo, { ...company, category: categoryName });
+        global.companyIndex.set(company.referenceNo, { ...company, category: categoryName });
       }
     }
   }
@@ -573,19 +582,20 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
   const direct = global.companyIndex.get(creditorNo) || global.companyIndex.get(referenceNo);
   if (direct) {
     companyCache.set(cacheKey, direct);
-    return direct;
+    const durationMs = Math.round(getNow() - startTime);
+    return { ...direct, durationMs, startedAt: startTimeIso };
   }
 
   let bestMatch = null;
   let bestScore = 0;
 
-  for (const [catName, catData] of Object.entries(categories)) {
-    for (const c of catData.companies) {
-      const nameScore = bestSubstringMatch(comment, c.name);
+  for (const [categoryName, categoryData] of Object.entries(categories)) {
+    for (const company of categoryData.companies) {
+      const nameScore = bestSubstringMatch(comment, company.name);
       if (nameScore < MIN_NAME_SIMILARITY) continue;
 
-      const categoryBonus = 1 / parseInt(catData.priority || 1);
-      const historyBoost = previousMatches.has(c.creditorNo) ? 0.1 : 0;
+      const categoryBonus = 1 / parseInt(categoryData.priority || 1);
+      const historyBoost = previousMatches.has(company.creditorNo) ? 0.1 : 0;
 
       const combinedScore =
         nameScore * adaptiveWeights.name +
@@ -594,7 +604,7 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
 
       if (combinedScore > bestScore) {
         bestScore = combinedScore;
-        bestMatch = { ...c, category: catName, matchScore: combinedScore };
+        bestMatch = { ...company, category: categoryName, matchScore: combinedScore };
       }
     }
   }
@@ -602,17 +612,13 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
   if (bestMatch) {
     previousMatches.set(bestMatch.creditorNo, (previousMatches.get(bestMatch.creditorNo) || 0) + 1);
 
-    if (previousMatches.size % 10 === 0) {
-      adaptiveWeights.name = Math.min(0.7, adaptiveWeights.name + 0.02);
-      adaptiveWeights.history = Math.min(0.3, adaptiveWeights.history + 0.01);
-    }
-
     if (bestScore < 0.85) {
       console.warn("Lav tillid i match:", comment, "→", bestMatch.name, "score:", bestScore);
     }
 
     companyCache.set(cacheKey, bestMatch);
-    return bestMatch;
+    const durationMs = Math.round(getNow() - startTime);
+    return { ...bestMatch, durationMs, startedAt: startTimeIso };
   }
 
   // fallback hvis intet match
@@ -624,20 +630,50 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
     fikNo
   };
   companyCache.set(cacheKey, fallback);
-  return fallback;
+  const durationMs = Math.round(getNow() - startTime);
+  return { ...fallback, durationMs, startedAt: startTimeIso };
+}
+
+export function getCategories() {
+  const usersData = getUsersDataCached();
+  return getCategoriesCached();
+}
+
+// --- Simple process-level caching ---------------------------------
+export let _cachedUsersData = null;
+export let _cachedCategories = null;
+
+export function getUsersDataCached(force = false) {
+  if (force || !_cachedUsersData) {
+    _cachedUsersData = loadUsersData();
+  }
+  return _cachedUsersData;
+}
+
+export function getCategoriesCached(force = false) {
+  if (force || !_cachedCategories) {
+    _cachedCategories = buildCategories(getUsersDataCached(force));
+  }
+  return _cachedCategories;
+}
+
+export function invalidateCaches() {
+  _cachedUsersData = null;
+  _cachedCategories = null;
 }
 
 export function findCompanyAdvancedWithSteps(creditorNo, referenceNo, fikNo, comment = "") {
   const steps = [];
-  const categories = buildCategories(loadUsersData());
-
+  const categories = getCategoriesCached();
+  const startTime = getNow();
+  const startTimeIso = new Date().toISOString();
   const cacheKey = `${creditorNo}_${referenceNo}_${fikNo}_${comment}`;
 
   steps.push({
     stage: "initialization",
     title: "🔍 Initialisering",
     description: "Starter søgeprocessen",
-    data: { creditorNo, referenceNo, fikNo, comment }
+    data: { creditorNo, referenceNo, fikNo, comment, startTime: startTimeIso }
   });
 
   if (companyCache.has(cacheKey)) {
@@ -648,7 +684,15 @@ export function findCompanyAdvancedWithSteps(creditorNo, referenceNo, fikNo, com
       data: companyCache.get(cacheKey),
       duration: "< 1ms"
     });
-    return { result: { ...companyCache.get(cacheKey), fromCache: true }, steps };
+    const durationMs = Math.round(getNow() - startTime);
+    steps.push({
+      stage: "duration",
+      title: "⏱️ Total Varighed",
+      description: "Samlet tid for hele matching processen",
+      data: { durationMs, startedAt: startTimeIso }
+    });
+    const resultObj = { ...companyCache.get(cacheKey), fromCache: true, durationMs, startedAt: startTimeIso };
+    return { result: resultObj, steps };
   }
 
   steps.push({
@@ -703,7 +747,14 @@ export function findCompanyAdvancedWithSteps(creditorNo, referenceNo, fikNo, com
       confidence: "100%"
     });
     companyCache.set(cacheKey, direct);
-    return { result: direct, steps };
+    const durationMs = Math.round(getNow() - startTime);
+    steps.push({
+      stage: "duration",
+      title: "⏱️ Total Varighed",
+      description: "Samlet tid for hele matching processen",
+      data: { durationMs, startedAt: startTimeIso }
+    });
+    return { result: { ...direct, durationMs, startedAt: startTimeIso }, steps };
   }
 
   steps.push({
@@ -720,13 +771,13 @@ export function findCompanyAdvancedWithSteps(creditorNo, referenceNo, fikNo, com
   let bestScore = 0;
   const candidates = [];
 
-  for (const [catName, catData] of Object.entries(categories)) {
-    for (const c of catData.companies) {
-      const nameScore = bestSubstringMatch(comment, c.name);
+  for (const [categoryName, categoryData] of Object.entries(categories)) {
+    for (const company of categoryData.companies) {
+      const nameScore = bestSubstringMatch(comment, company.name);
       if (nameScore < MIN_NAME_SIMILARITY) continue;
 
-      const categoryBonus = 1 / parseInt(catData.priority || 1);
-      const historyBoost = previousMatches.has(c.creditorNo) ? 0.1 : 0;
+      const categoryBonus = 1 / parseInt(categoryData.priority || 1);
+      const historyBoost = previousMatches.has(company.creditorNo) ? 0.1 : 0;
 
       const combinedScore =
         nameScore * adaptiveWeights.name +
@@ -734,17 +785,17 @@ export function findCompanyAdvancedWithSteps(creditorNo, referenceNo, fikNo, com
         historyBoost * adaptiveWeights.history;
 
       candidates.push({
-        name: c.name,
-        category: catName,
+        name: company.name,
+        category: categoryName,
         nameScore: parseFloat(nameScore.toFixed(4)),
         categoryBonus: parseFloat(categoryBonus.toFixed(4)),
         historyBoost: parseFloat(historyBoost.toFixed(4)),
-        combinedScore: parseFloat(combinedScore.toFixed(4))
+        combinedScore: parseFloat(combinedScore.toFixed(4)),
       });
 
       if (combinedScore > bestScore) {
         bestScore = combinedScore;
-        bestMatch = { ...c, category: catName, matchScore: combinedScore };
+        bestMatch = { ...company, category: categoryName, matchScore: combinedScore };
       }
     }
   }
@@ -779,7 +830,14 @@ export function findCompanyAdvancedWithSteps(creditorNo, referenceNo, fikNo, com
     });
 
     companyCache.set(cacheKey, bestMatch);
-    return { result: { ...bestMatch, matchScore: bestScore }, steps };
+    const durationMs = Math.round(getNow() - startTime);
+    steps.push({
+      stage: "duration",
+      title: "⏱️ Total Varighed",
+      description: "Samlet tid for hele matching processen",
+      data: { durationMs, startedAt: startTimeIso }
+    });
+    return { result: { ...bestMatch, matchScore: bestScore, durationMs, startedAt: startTimeIso }, steps };
   }
 
   steps.push({
@@ -787,6 +845,13 @@ export function findCompanyAdvancedWithSteps(creditorNo, referenceNo, fikNo, com
     title: "❌ Intet Match Fundet",
     description: "Bruger fallback - kommentarteksten som navn",
     data: { comment }
+  });
+
+  steps.push({
+    stage: "duration",
+    title: "⏱️ Total Varighed",
+    description: "Samlet tid for hele matching processen",
+    data: { durationMs: Math.round(getNow() - startTime), startedAt: startTimeIso }
   });
 
   const fallback = {
@@ -797,19 +862,20 @@ export function findCompanyAdvancedWithSteps(creditorNo, referenceNo, fikNo, com
     fikNo
   };
   companyCache.set(cacheKey, fallback);
-  return { result: fallback, steps };
+  const durationMs = Math.round(getNow() - startTime);
+  return { result: { ...fallback, durationMs, startedAt: startTimeIso }, steps };
 }
 
 export function findCompanyByDebGrNrAndPbsNo(debGrNr, pbsNo) {
   debGrNr = String(debGrNr).trim();
   pbsNo = String(pbsNo).trim();
 
-  const usersData = loadUsersData();
-  const categories = buildCategories(usersData);
+  const usersData = getUsersDataCached();
+  const categories = getCategoriesCached();
 
   for (const [category, { companies }] of Object.entries(categories)) {
     const company = companies.find(
-      c => String(c.debGrNr).trim() === debGrNr && String(c.pbsNo).trim() === pbsNo
+      company => String(company.debGrNr).trim() === debGrNr && String(company.pbsNo).trim() === pbsNo
     );
     if (company) {
       return {
@@ -829,9 +895,4 @@ export function findCompanyByDebGrNrAndPbsNo(debGrNr, pbsNo) {
     pbsNo,
     matchType: "None",
   };
-}
-
-export function getCategories() {
-  const usersData = loadUsersData();
-  return buildCategories(usersData);
 }

@@ -1,8 +1,13 @@
 import fs from "fs";
 import path from "path";
 import NextCors from "nextjs-cors";
+import { findCompanyAdvanced } from "../../../service/categorizeService.js";
 
 const filePath = path.join(process.cwd(), "data", "users.json");
+
+export function getNow() {
+  return (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+}
 
 export default async function handler(req, res) {
   await NextCors(req, res, {
@@ -48,16 +53,24 @@ export default async function handler(req, res) {
           const timestampLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
             .toISOString()
             .replace(/Z$/, "");
+          
+          const match = findCompanyAdvanced(
+            String(receiverCreditorNo).trim(),
+            String(receiverReferenceNo).trim(),
+            String(fikNo || "").trim(),
+            comment || ""
+          );
 
           const newTransaction = {
-            company: company || "Ukendt virksomhed",
-            category: category || "Ukendt kategori",
+            company: (match && match.name) || company || "Ukendt virksomhed",
+            category: (match && match.category) || category || "Ukendt kategori",
             receiverCreditorNo: String(receiverCreditorNo).trim(),
             receiverReferenceNo: String(receiverReferenceNo).trim(),
             fikNo,
             amount,
             comment,
-              timestamp: timestampLocal, // lokal tid, ingen UTC felt
+            timestamp: timestampLocal, // lokal tid, ingen UTC felt
+            durationMs: match && match.durationMs ? match.durationMs : 0,
             type: "sent",
           };
           card.transactions.push(newTransaction);

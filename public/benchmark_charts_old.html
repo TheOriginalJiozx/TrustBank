@@ -124,22 +124,22 @@
 <body>
   <div class="container">
     <h1>Microbenchmark Results</h1>
-    <p class="subtitle">Cache Performance Analysis - Generated 16.12.2025, 21.08.18</p>
+    <p class="subtitle">Cache Performance Analysis - Generated 8.12.2025, 23.20.38</p>
 
     <div class="stats-grid">
       <div class="stat-card">
         <h3>Speedup Factor</h3>
-        <div class="value">9.2x</div>
+        <div class="value">6.0x</div>
         <div class="label">Hurtigere med warm cache</div>
       </div>
       <div class="stat-card">
         <h3>Runtime Reduction</h3>
-        <div class="value">89.1%</div>
+        <div class="value">83.5%</div>
         <div class="label">Mindre total runtime</div>
       </div>
       <div class="stat-card">
         <h3>Latency Reduction</h3>
-        <div class="value">89.1%</div>
+        <div class="value">83.5%</div>
         <div class="label">Mindre gennemsnitlig latency</div>
       </div>
       <div class="stat-card">
@@ -182,9 +182,9 @@
       <tbody>
         <tr>
           <td class="metric-name">Average Time</td>
-          <td>0.8758 ms</td>
-          <td>0.0955 ms</td>
-          <td class="improvement">89.1% hurtigere</td>
+          <td>0.6227 ms</td>
+          <td>0.1030 ms</td>
+          <td class="improvement">83.5% hurtigere</td>
         </tr>
         <tr>
           <td class="metric-name">Median Time (P50)</td>
@@ -194,21 +194,21 @@
         </tr>
         <tr>
           <td class="metric-name">P95 Latency</td>
+          <td>2 ms</td>
+          <td>1 ms</td>
+          <td class="improvement">50.0% bedre</td>
+        </tr>
+        <tr>
+          <td class="metric-name">P99 Latency</td>
           <td>3 ms</td>
           <td>1 ms</td>
           <td class="improvement">66.7% bedre</td>
         </tr>
         <tr>
-          <td class="metric-name">P99 Latency</td>
-          <td>5 ms</td>
-          <td>1 ms</td>
-          <td class="improvement">80.0% bedre</td>
-        </tr>
-        <tr>
           <td class="metric-name">Standard Deviation</td>
-          <td>1.5145 ms</td>
-          <td>0.2938 ms</td>
-          <td class="improvement">80.6% strammere</td>
+          <td>0.9220 ms</td>
+          <td>0.3040 ms</td>
+          <td class="improvement">67.0% strammere</td>
         </tr>
         <tr>
           <td class="metric-name">Min Time</td>
@@ -218,15 +218,15 @@
         </tr>
         <tr>
           <td class="metric-name">Max Time</td>
-          <td>22 ms</td>
+          <td>8 ms</td>
           <td>1 ms</td>
-          <td class="improvement">21 ms forskel</td>
+          <td class="improvement">7 ms forskel</td>
         </tr>
         <tr>
           <td class="metric-name">Total Runtime</td>
-          <td>578 ms</td>
-          <td>63 ms</td>
-          <td class="improvement">89.1% hurtigere</td>
+          <td>411 ms</td>
+          <td>68 ms</td>
+          <td class="improvement">83.5% hurtigere</td>
         </tr>
       </tbody>
     </table>
@@ -251,14 +251,14 @@
         datasets: [
           {
             label: 'Cold Cache',
-            data: [{"x":0,"y":342},{"x":0.5,"y":0},{"x":1,"y":164},{"x":1.5,"y":0},{"x":2,"y":111},{"x":2.5,"y":0},{"x":3,"y":28},{"x":3.5,"y":0},{"x":4,"y":6},{"x":4.5,"y":0},{"x":5,"y":3},{"x":5.5,"y":0},{"x":6,"y":1},{"x":6.5,"y":0},{"x":7,"y":1},{"x":7.5,"y":0},{"x":8,"y":1},{"x":8.5,"y":0},{"x":9,"y":0},{"x":9.5,"y":0},{"x":10,"y":1},{"x":10.5,"y":0},{"x":11,"y":0},{"x":11.5,"y":0},{"x":12,"y":0},{"x":12.5,"y":0},{"x":13,"y":0},{"x":13.5,"y":0},{"x":14,"y":0},{"x":14.5,"y":0},{"x":15,"y":0},{"x":15.5,"y":0},{"x":16,"y":1},{"x":16.5,"y":0},{"x":17,"y":0},{"x":17.5,"y":0},{"x":18,"y":0},{"x":18.5,"y":0},{"x":19,"y":0},{"x":19.5,"y":0},{"x":20,"y":0},{"x":20.5,"y":0},{"x":21,"y":0},{"x":21.5,"y":0},{"x":22,"y":1}],
+            data: [{"x":0,"y":384},{"x":0.5,"y":0},{"x":1,"y":173},{"x":1.5,"y":0},{"x":2,"y":86},{"x":2.5,"y":0},{"x":3,"y":11},{"x":3.5,"y":0},{"x":4,"y":3},{"x":4.5,"y":0},{"x":5,"y":1},{"x":5.5,"y":0},{"x":6,"y":0},{"x":6.5,"y":0},{"x":7,"y":0},{"x":7.5,"y":0},{"x":8,"y":2}],
             backgroundColor: chartColors.cold,
             borderColor: chartColors.coldBorder,
             borderWidth: 1,
           },
           {
             label: 'Warm Cache',
-            data: [{"x":0,"y":597},{"x":0.5,"y":0},{"x":1,"y":63}],
+            data: [{"x":0,"y":592},{"x":0.5,"y":0},{"x":1,"y":68}],
             backgroundColor: chartColors.warm,
             borderColor: chartColors.warmBorder,
             borderWidth: 1,
@@ -298,14 +298,14 @@
         datasets: [
           {
             label: 'Cold Cache',
-            data: [0.8758, 0, 1.5145, 0, 22],
+            data: [0.6227, 0, 0.922, 0, 8],
             backgroundColor: chartColors.cold,
             borderColor: chartColors.coldBorder,
             borderWidth: 2,
           },
           {
             label: 'Warm Cache',
-            data: [0.0955, 0, 0.2938, 0, 1],
+            data: [0.103, 0, 0.304, 0, 1],
             backgroundColor: chartColors.warm,
             borderColor: chartColors.warmBorder,
             borderWidth: 2,
@@ -335,7 +335,7 @@
         datasets: [
           {
             label: 'Cold Cache',
-            data: [0, 1, 3, 5],
+            data: [0, 1, 2, 3],
             backgroundColor: chartColors.cold,
             borderColor: chartColors.coldBorder,
             borderWidth: 3,

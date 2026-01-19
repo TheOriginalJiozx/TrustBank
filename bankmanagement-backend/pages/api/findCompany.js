@@ -27,7 +27,10 @@ export default async function handler(req, res) {
       creditorNo: company.creditorNo,
       referenceNo: company.referenceNo,
       fikNo: company.fikNo,
-      comment: company.comment || comment || ""
+      comment: company.comment || comment || "",
+      durationMs: company.durationMs || null,
+      startedAt: company.startedAt || null,
+      fromCache: company.fromCache || false
     });
   } catch (err) {
     console.error("Fejl i findCompany API:", err);
