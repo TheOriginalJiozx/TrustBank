@@ -4,7 +4,10 @@ import NextCors from "nextjs-cors";
 import { findCompanyByDebGrNrAndPbsNo } from "../../service/categorizeService";
 import crypto from "crypto";
 
-console.log("[directdebits] KALD", new Date().toISOString());
+console.log(
+  "[directdebits] KALD",
+  new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().replace(/Z$/, "")
+);
 
 const dirPath = path.join(process.cwd(), "data");
 const filePath = path.join(dirPath, "users.json");
@@ -108,7 +111,9 @@ export default async function handler(req, res) {
         dayOfMonth: Number(dayOfMonth),
         note: String(note || "").trim(),
         active: true,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+          .toISOString()
+          .replace(/Z$/, ""),
       };
 
       card.directDebits.push(newMandate);

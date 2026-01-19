@@ -561,7 +561,9 @@ export function findCompanyAdvanced(creditorNo, referenceNo, fikNo, comment = ""
   const categories = getCategoriesCached();
 
   const startTime = getNow();
-  const startTimeIso = new Date().toISOString();
+  const startTimeIso = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .replace(/Z$/, "");
 
   const cacheKey = `${creditorNo}_${referenceNo}_${fikNo}_${comment}`;
   if (companyCache.has(cacheKey)) {
@@ -666,7 +668,9 @@ export function findCompanyAdvancedWithSteps(creditorNo, referenceNo, fikNo, com
   const steps = [];
   const categories = getCategoriesCached();
   const startTime = getNow();
-  const startTimeIso = new Date().toISOString();
+  const startTimeIso = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .replace(/Z$/, "");
   const cacheKey = `${creditorNo}_${referenceNo}_${fikNo}_${comment}`;
 
   steps.push({

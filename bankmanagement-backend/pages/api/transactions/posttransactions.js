@@ -43,7 +43,8 @@ export default async function handler(req, res) {
     let sentTransaction = null;
 
     for (const username in users) {
-      users[username].forEach((card) => {
+      const cards = Array.isArray(users[username]) ? users[username] : [users[username]];
+      cards.forEach((card) => {
         if (
           String(card.regNo) === String(senderRegNo).trim() &&
           String(card.accNo) === String(senderAccNo).trim()

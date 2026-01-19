@@ -113,7 +113,9 @@ function writeOutputs() {
   fs.writeFileSync(outputFile, header + lines.join("\n"), "utf8");
 
   const benchmarkResults = {
-    timestamp: new Date().toISOString(),
+    timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+      .toISOString()
+      .replace(/Z$/, ""),
     passes: resultsPerPass.map(({ pass, stats }) => ({ pass, ...stats })),
   };
 

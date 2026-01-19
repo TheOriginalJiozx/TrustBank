@@ -37,7 +37,9 @@ export default async function handler(req, res) {
         return res.status(404).json({ message: 'Bruger findes ikke' });
       }
 
-      return res.status(200).json(users[username]);
+      const entry = users[username];
+      if (Array.isArray(entry)) return res.status(200).json(entry);
+      return res.status(200).json([entry]);
     }
 
     if (req.method === 'POST') {
@@ -52,9 +54,14 @@ export default async function handler(req, res) {
         const accNo = String(Math.floor(1000000000 + Math.random() * 9000000000));
         const cardNo = String(Math.floor(1000000000000000 + Math.random() * 9000000000000000));
         const cvv = String(Math.floor(100 + Math.random() * 900));
-        users[username] = { username, regNo, accNo, cardNo, cvv };
+        users[username] = [ { username, regNo, accNo, cardNo, cvv, transactions: [] } ];
 
         fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
+      } else {
+        if (!Array.isArray(users[username])) {
+          users[username] = [ users[username] ];
+          fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
+        }
       }
 
       return res.status(200).json(users[username]);

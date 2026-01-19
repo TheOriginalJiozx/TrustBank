@@ -30,7 +30,9 @@ export default async function handler(req, res) {
         success: true,
         result,
         steps,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+          .toISOString()
+          .replace(/Z$/, ""),
       });
     } catch (error) {
       console.error('Fejl i visualize-match:', error);
