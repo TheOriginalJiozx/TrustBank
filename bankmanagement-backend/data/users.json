@@ -7,6 +7,42 @@
       "cardNo": "9636249426885700",
       "cvv": "714",
       "transactions": [
+        {
+          "company": "Netto",
+          "category": "Dagligvarer",
+          "receiverCreditorNo": "28745193",
+          "receiverReferenceNo": "153984726051487",
+          "fikNo": "+71",
+          "amount": "150",
+          "comment": "",
+          "timestamp": "2026-01-21T08:21:25.895",
+          "durationMs": 0,
+          "type": "sent"
+        },
+        {
+          "company": "Netto",
+          "category": "Dagligvarer",
+          "receiverCreditorNo": "28745193",
+          "receiverReferenceNo": "153984726051487",
+          "fikNo": "+71",
+          "amount": "200",
+          "comment": "",
+          "timestamp": "2026-01-21T08:22:33.193",
+          "durationMs": 0,
+          "type": "sent"
+        },
+        {
+          "company": "Netto",
+          "category": "Dagligvarer",
+          "receiverCreditorNo": "28745193",
+          "receiverReferenceNo": "153984726051487",
+          "fikNo": "+71",
+          "amount": "300",
+          "comment": "",
+          "timestamp": "2026-01-21T08:29:25.554",
+          "durationMs": 0,
+          "type": "sent"
+        }
       ],
       "directDebits": []
     },

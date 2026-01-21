@@ -49,7 +49,7 @@ export default function Transactions() {
 
     let initialCard = cards[0];
     if (cardNo) {
-      const found = cards.find((c) => c.cardNo === cardNo);
+      const found = cards.find((card) => card.cardNo === cardNo);
       if (found) initialCard = found;
     }
 
@@ -60,6 +60,26 @@ export default function Transactions() {
       .then((res) => res.json())
       .then((data) => setCategories(data))
       .catch(() => setCategories([]));
+
+    (async () => {
+      try {
+        const username = initialCard?.username || cards[0]?.username;
+        if (!username) return;
+        const res = await fetch(
+          `http://localhost:3001/api/users?username=${encodeURIComponent(username)}`
+        );
+        if (!res.ok) return;
+        const fresh = await res.json();
+        const freshCards = Array.isArray(fresh) ? fresh : [fresh];
+        setUserCards(freshCards);
+        const freshInitial = freshCards.find((card) => card.cardNo === cardNo) || freshCards[0];
+        setSelectedCard(freshInitial);
+        setTransactions(freshInitial?.transactions || []);
+        localStorage.setItem("loggedInUser", JSON.stringify(freshCards));
+      } catch (error) {
+        console.error("Fejl ved hentning af frisk brugerdata:", error);
+      }
+    })();
   }, [navigate, cardNo]);
 
   useEffect(() => {
@@ -172,7 +192,7 @@ export default function Transactions() {
             label: `${card.cardNo} (Reg.nr.: ${card.regNo} - Kontonr.: ${card.accNo})`,
           }))}
           onChange={(e) => {
-            const card = userCards.find((c) => c.cardNo === e.value);
+            const card = userCards.find((c) => card.cardNo === e.value);
             if (card) {
               setSelectedCard(card);
               setTransactions(card.transactions || []);
